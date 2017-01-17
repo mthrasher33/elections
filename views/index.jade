@@ -1,0 +1,64 @@
+
+extends layout
+
+block content
+	div.container
+		div.row.map-holder
+			div.col-xs-12
+				h1.map-title Minneapolis Map
+			div.col-xs-10
+				div#map
+			div.col-xs-2
+				div#form
+					form(name="get_precincts", method="post", action="/getPrecincts")#getPrecincts
+						div.btn-group
+							input(type="button", data-toggle="dropdown", aria-haspopup="true", aria-expanded="false", value="Year").btn.btn-danger.dropdown-toggle.year 
+							div.dropdown-menu
+								ul
+								for year, i in years
+									li.dropdown-item #{years[i].Year} 
+										span.display-none #{years[i].idElection}
+block script
+	script(type='text/javascript').
+		//$(document).ready(function() {
+			var map;
+			function initMap(){
+				map = new google.maps.Map(document.getElementById('map'), {
+					center: {lat: 44.98154, lng: -93.270718},
+					zoom: 12					
+				});
+
+				var polygonCoords = [
+					new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(45.0131,-93.26325), new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.03555,-93.23892), new google.maps.LatLng(45.03561,-93.22694), new google.maps.LatLng(45.01306,-93.22694), new google.maps.LatLng(45.01306,-93.21353), new google.maps.LatLng(45.00586,-93.21353), new google.maps.LatLng(45.00604,-93.2079), new google.maps.LatLng(45.00604,-93.20802), new google.maps.LatLng(44.99185,-93.20786), new google.maps.LatLng(44.98803,-93.20784), new google.maps.LatLng(44.98803,-93.2271), new google.maps.LatLng(44.99185,-93.22722), new google.maps.LatLng(44.99185,-93.23722), new google.maps.LatLng(44.99882,-93.23722), new google.maps.LatLng(44.99882,-93.24675), 
+
+				];
+
+				  // Styling & Controls
+				 myPolygon = new google.maps.Polygon({
+				    paths: polygonCoords,
+				    //draggable: true, // turn off if it gets annoying
+				    //editable: true,
+				    strokeColor: '#FF0000',
+				    strokeOpacity: 0.8,
+				    strokeWeight: 2,
+				    fillColor: '#FF0000',
+				    fillOpacity: 0.35
+				});
+
+				myPolygon.setMap(map);
+			};
+
+
+			//bind events
+			$('li.dropdown-item').click(function(){
+				$('form#getPrecincts').submit();
+			});
+
+
+
+
+
+			//var geoCode = #{geoCode};
+			//alert(geoCode);
+		//});
+	script(async, defer, src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiT0h95IpSJ4N3YNhyFnEcEHrv4ruz4SY&callback=initMap")

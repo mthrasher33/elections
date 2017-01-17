@@ -1,0 +1,27 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    title #{title} - Minneapolis Election Results
+    link(rel='stylesheet',href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/dataTables.bootstrap.min.css')
+    link(rel='stylesheet',href='/stylesheets/global.css')
+
+  body
+    .body-content
+        block content
+
+
+include footer
+
+    script(src="/javascripts/jquery-3.1.0.min.js")
+    script(src="/javascripts/bootstrap.min.js")
+    script(src="/javascripts/typeahead.min.js")
+    script(src="/javascripts/jquery.dataTables.min.js")
+    script(src="/javascripts/dataTables.bootstrap.min.js")
+    script(src="/javascripts/global.js")
+    script(src="https://use.fontawesome.com/bca7d337a3.js")
+    //script(src="https://maps.googleapis.com/maps/api/js?callback=myMap")
+        
+    block script
