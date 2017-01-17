@@ -29,7 +29,8 @@ padding: 15px;
 input.year {
 	min-width: 160px;
 }
-span.display-none {
+
+.display-none {
     display:none;
 }
 .dropdown-item {

@@ -3,6 +3,7 @@ var router = express.Router();
 var mysql = require('mysql');
 var GoogleMapsAPI = require('googlemaps');
 var datalayer = require('../data/datalayer.js');
+var moment = require('moment');
 
 
 //var nodemailer = require('nodemailer');
@@ -40,13 +41,19 @@ router.get('/', function (req, res) {
     
     datalayer.getElectionYears(function(err,rows,fields){
         if(!err){
+
+
+
             res.render('index', {title: 'Test', years: rows});
             console.log(rows);
 
         } else {
             console.log('Error while performing Query: ' + err);
         }
-    });    
+    });
+
+
+ 
 });
 
 /*GET autocomplte for home page search*/
@@ -63,16 +70,45 @@ router.get('/search', function (req, res) {
     // });
 });
 
+router.get('/getRaces/:raceID', function(req,res){
+    //console.log(req.params.raceID);
+    datalayer.getRaces(req.params.raceID, function(err,rows,fields){
+        if(!err) {
+            res.send({races: rows});
+            //console.log(rows);
+        } else {
+            console.log('Error while performing Query: ' + err);
+        }
+    });
+});
+
+//returns the shape of the wards that are drawn on the map
+router.get('/getWards/:electionID', function(req,res){
+    //var electionDate = req.params.electionYear + "-12-31 23:59:59";
+    var electionID = req.params.electionID;    
+
+    //console.log(electionDate);
+    datalayer.getWards(electionID, function(err,rows,fields){
+        if(!err) {
+            res.send({wards: rows});
+            //console.log(rows);
+        } else {
+            console.log('Error while performing Query: ' + err);
+        }
+    });
+});
+
+
 /*POST to check if user input is in database*/
 router.post('/getPrecincts', function (req, res) {
     // console.log("POST METHOD:");
     // console.log(req.body.typeahead) //returns what the user typed in the box
 
     //connect to database and search the input in the address column
-    datalayer.getPrecincts(req.body.typeahead, function (err, rows, fields) {
+    datalayer.getPrecincts(function (err, rows, fields) {
         if(!err){
             res.render('index', {precincts: rows});
-            console.log(rows);
+//            console.log(rows);
 
         } else {
             console.log('Error while performing Query: ' + err);

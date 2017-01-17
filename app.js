@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 var mysql = require('mysql');
 var routes = require('./routes/index');
 var GoogleMapsAPI = require('googlemaps');
+var jade = require('jade');
+var moment = require('moment');
 
 
 var app = express();

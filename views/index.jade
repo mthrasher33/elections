@@ -10,17 +10,31 @@ block content
 				div#map
 			div.col-xs-2
 				div#form
-					form(name="get_precincts", method="post", action="/getPrecincts")#getPrecincts
-						div.btn-group
-							input(type="button", data-toggle="dropdown", aria-haspopup="true", aria-expanded="false", value="Year").btn.btn-danger.dropdown-toggle.year 
-							div.dropdown-menu
-								ul
-								for year, i in years
-									li.dropdown-item #{years[i].Year} 
-										span.display-none #{years[i].idElection}
+					div.form-group
+						label(for='sYears') Year
+						select.form-control#sYears
+							for year, i in years
+								option.dropdown-item(value="#{years[i].idElection}") #{years[i].Year}
+								//span.display-none #{years[i].idElection}
+					//form(name="get_precincts", method="post", action="/getPrecincts")#getPrecincts
+					//div.btn-group
+					//	input(type="button", data-toggle="dropdown", aria-haspopup="true", aria-expanded="false", value="Year").btn.btn-danger.dropdown-toggle.year 
+					//		ul
+					//		for year, i in years
+					//			li.dropdown-item #{years[i].Year} 
+					//				span.display-none #{years[i].idElection}
+					div.form-group
+						label(for='sYears') Race
+						select.form-control#sRaces
+							//for year, i in years
+							//	option #{years[i].Year}
+							//	span.display-none #{years[i].idElection}
 block script
 	script(type='text/javascript').
 		//$(document).ready(function() {
+			updateRaces();
+			drawWards();
+
 			var map;
 			function initMap(){
 				map = new google.maps.Map(document.getElementById('map'), {
@@ -28,8 +42,32 @@ block script
 					zoom: 12					
 				});
 
+				
+			};
+
+
+			//bind events
+			$('select#sYears').change(function(){
+				drawWards();
+				updateRaces();
+			});
+
+
+
+
+
+			//var geoCode = #{geoCode};
+			//alert(geoCode);
+		//});
+
+		function drawWards(){
+			var selected = $('select#sYears option:selected').val();
+			//console.log(selected);
+			$.getJSON("/getWards/" + selected, function(data){
+				console.log(data.wards)
+
 				var polygonCoords = [
-					new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(45.0131,-93.26325), new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.03555,-93.23892), new google.maps.LatLng(45.03561,-93.22694), new google.maps.LatLng(45.01306,-93.22694), new google.maps.LatLng(45.01306,-93.21353), new google.maps.LatLng(45.00586,-93.21353), new google.maps.LatLng(45.00604,-93.2079), new google.maps.LatLng(45.00604,-93.20802), new google.maps.LatLng(44.99185,-93.20786), new google.maps.LatLng(44.98803,-93.20784), new google.maps.LatLng(44.98803,-93.2271), new google.maps.LatLng(44.99185,-93.22722), new google.maps.LatLng(44.99185,-93.23722), new google.maps.LatLng(44.99882,-93.23722), new google.maps.LatLng(44.99882,-93.24675), 
+					new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(45.0131,-93.26325), new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.03555,-93.23892), new google.maps.LatLng(45.03561,-93.22694), new google.maps.LatLng(45.01306,-93.22694), new google.maps.LatLng(45.01306,-93.21353), new google.maps.LatLng(45.00586,-93.21353), new google.maps.LatLng(45.00604,-93.2079), new google.maps.LatLng(45.00604,-93.20802), new google.maps.LatLng(44.99185,-93.20786), new google.maps.LatLng(44.98803,-93.20784), new google.maps.LatLng(44.98803,-93.2271), new google.maps.LatLng(44.99185,-93.22722), new google.maps.LatLng(44.99185,-93.23722), new google.maps.LatLng(44.99882,-93.23722), new google.maps.LatLng(44.99882,-93.24675) 
 
 				];
 
@@ -46,19 +84,26 @@ block script
 				});
 
 				myPolygon.setMap(map);
-			};
 
+			})
+		}
 
-			//bind events
-			$('li.dropdown-item').click(function(){
-				$('form#getPrecincts').submit();
-			});
+		function updateRaces(){
+			//only re-do everything if they have not changed the race box
+				//if($('select#sRace').index()>0 && $('select#sRace').length != 0){
+				var selected = $('select#sYears').val();
+				//$('form#getPrecincts').submit();
+				$.getJSON("/getRaces/" + selected, function(data){
+					//$('#matt').html(data.matt);
+					$('select#sRaces').children().remove().end();
 
-
-
-
-
-			//var geoCode = #{geoCode};
-			//alert(geoCode);
-		//});
+					
+					//populate dropdown menu from returned data
+					$.each(data.races, function(i, value){
+						$('select#sRaces').append($('<option>').text(value.Name).attr('value',value));
+					});
+					//console.log(data.races);
+				});
+				//}
+		}
 	script(async, defer, src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiT0h95IpSJ4N3YNhyFnEcEHrv4ruz4SY&callback=initMap")
