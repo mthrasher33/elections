@@ -31,6 +31,8 @@ block content
 							//	span.display-none #{years[i].idElection}
 block script
 	script(type='text/javascript').
+		var allShapes = [];
+
 		//$(document).ready(function() {
 			updateRaces();
 			drawWards();
@@ -52,41 +54,119 @@ block script
 				updateRaces();
 			});
 
-
-
-
-
-			//var geoCode = #{geoCode};
-			//alert(geoCode);
 		//});
+
+		function getLatLngFromString(ll){
+			var latlng = ll.split(/, ?/)
+			return new google.maps.LatLng(parseFloat(latlng[0]), parseFloat(latlng[1])); 
+		}
 
 		function drawWards(){
 			var selected = $('select#sYears option:selected').val();
-			//console.log(selected);
+
+			//first clear all the shapes on the map
+			
+			for (var i=0; i<allShapes.length; i++){
+				console.log(allShapes[i]);
+				allShapes[i].setMap(null);
+				//allShapes.pop();
+				//allShapes.splice(i, 1);
+				//allShapes[i].setVisible(false);
+				//allShapes[i] = null;
+			}
+
+			//empty the allShapes array
+			allShapes = [];
+
+			//find all the wards in the election year
 			$.getJSON("/getWards/" + selected, function(data){
-				console.log(data.wards)
 
-				var polygonCoords = [
-					new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(45.0131,-93.26325), new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.03555,-93.23892), new google.maps.LatLng(45.03561,-93.22694), new google.maps.LatLng(45.01306,-93.22694), new google.maps.LatLng(45.01306,-93.21353), new google.maps.LatLng(45.00586,-93.21353), new google.maps.LatLng(45.00604,-93.2079), new google.maps.LatLng(45.00604,-93.20802), new google.maps.LatLng(44.99185,-93.20786), new google.maps.LatLng(44.98803,-93.20784), new google.maps.LatLng(44.98803,-93.2271), new google.maps.LatLng(44.99185,-93.22722), new google.maps.LatLng(44.99185,-93.23722), new google.maps.LatLng(44.99882,-93.23722), new google.maps.LatLng(44.99882,-93.24675) 
+				var regExp = /\(([^)]+)\)/;
 
-				];
+				//for each ward in the election year
+				(data.wards).forEach(function(ward){
+					var wardCoords = [];
 
-				  // Styling & Controls
-				 myPolygon = new google.maps.Polygon({
-				    paths: polygonCoords,
-				    //draggable: true, // turn off if it gets annoying
-				    //editable: true,
-				    strokeColor: '#FF0000',
-				    strokeOpacity: 0.8,
-				    strokeWeight: 2,
-				    fillColor: '#FF0000',
-				    fillOpacity: 0.35
+					//split the boundaries into lat long pairs that will be fed into our function
+						if(ward.Boundaries){
+						ward.Boundaries = ward.Boundaries.split(/[()]+/).filter(function(e) { return e; });
+
+					//push every latlng pair in the polygon to the google maps initiator function
+						for (i=1; i<ward.Boundaries.length; i+=2){
+							wardCoords.push(getLatLngFromString(ward.Boundaries[i]));
+						}
+
+					// Styling & Controls
+							wardDesign = new google.maps.Polygon({
+						    paths: wardCoords,
+						    //draggable: true, // turn off if it gets annoying
+						    //editable: true,
+						    strokeColor: '#FF0000',
+						    strokeOpacity: 0.8,
+						    strokeWeight: 2,
+						    fillColor: '#FF0000',
+						    fillOpacity: 0.35
+						});
+
+						
+						google.maps.event.addListener(wardDesign.getPath(), 'set_at', function(){
+							//var wardDesign_path = wardDesign.getPath();
+							var len = wardDesign.getPath().getLength();
+							var htmlStr = ""
+							for (var i=0; i<len; i++){
+								htmlStr += ("new google.maps.LatLng(" +wardDesign.getPath().getAt(i).toUrlValue(5) + "), "); 
+							}
+							console.log(htmlStr);
+						});
+
+					allShapes.push(wardDesign);
+					wardDesign.setMap(map);
+
+					}
+
 				});
 
-				myPolygon.setMap(map);
+				//print the length of the all shapes array even if we don't have any data in the election year to which we changed
+				console.log(allShapes.length);
 
-			})
+
+
+				//var ward1 = [new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(45.0131,-93.26325), new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.03555,-93.23892), new google.maps.LatLng(45.03555,-93.22694), new google.maps.LatLng(45.01306,-93.22694), new google.maps.LatLng(45.01306,-93.21353), new google.maps.LatLng(45.00586,-93.21353), new google.maps.LatLng(45.00604,-93.206252), new google.maps.LatLng(45.00604,-93.206252), new google.maps.LatLng(44.99185,-93.206252), new google.maps.LatLng(44.988077,-93.206252), new google.maps.LatLng(44.987851, -93.233322), new google.maps.LatLng(44.991508,-93.23334), new google.maps.LatLng(44.991508,-93.23722), new google.maps.LatLng(44.99882,-93.23722), new google.maps.LatLng(44.99882,-93.24675) ];
+
+				//var ward2 = [new google.maps.LatLng(44.988077,-93.206252), new google.maps.LatLng(44.987851, -93.233322), new google.maps.LatLng(44.991508,-93.23334), new google.maps.LatLng(44.991508,-93.242014), new google.maps.LatLng(44.98934,-93.23918), new google.maps.LatLng(44.98502,-93.2316), new google.maps.LatLng(44.98084,-93.23454), new google.maps.LatLng(44.98288,-93.23999), new google.maps.LatLng(44.97904,-93.24341), new google.maps.LatLng(44.97973,-93.24563), new google.maps.LatLng(44.97042,-93.24593), new google.maps.LatLng(44.96881,-93.242014), new google.maps.LatLng(44.96514,-93.242014), new google.maps.LatLng(44.96495,-93.23382), new google.maps.LatLng(44.96461,-93.2331), new google.maps.LatLng(44.96482,-93.22869), new google.maps.LatLng(44.9649,-93.22713), new google.maps.LatLng(44.95975,-93.22694), new google.maps.LatLng(44.95976,-93.24633), new google.maps.LatLng(44.95613,-93.24357), new google.maps.LatLng(44.95613,-93.24099), new google.maps.LatLng(44.95516,-93.2403), new google.maps.LatLng(44.95553,-93.23936), new google.maps.LatLng(44.95431,-93.23829), new google.maps.LatLng(44.95437,-93.23629), new google.maps.LatLng(44.95367,-93.23649), new google.maps.LatLng(44.95424,-93.23505), new google.maps.LatLng(44.94917,-93.23476), new google.maps.LatLng(44.94181,-93.22921), new google.maps.LatLng(44.94174,-93.19859), new google.maps.LatLng(44.94864,-93.19882), new google.maps.LatLng(44.95419,-93.206252) ];
+				//console.log(polygonCoords);
+
+				/*var ward3 = [new google.maps.LatLng(45.0131,-93.27501),new google.maps.LatLng(45.0131,-93.26325),new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(44.99882,-93.23722), google.maps.LatLng(44.991508,-93.23722), new google.maps.LatLng(44.991508,-93.242014), new google.maps.LatLng(44.98934,-93.23918), new google.maps.LatLng(44.98502,-93.2316), new google.maps.LatLng(44.98084,-93.23454), new google.maps.LatLng(44.98288,-93.23999), new google.maps.LatLng(44.97904,-93.24341), new google.maps.LatLng(44.97973,-93.24563), new google.maps.LatLng(44.970214, -93.253267), new google.maps.LatLng(44.973278, -93.260593), new google.maps.LatLng(44.973967, -93.259979),  new google.maps.LatLng(44.974554, -93.259943), new google.maps.LatLng(44.97973,-93.24563), new google.maps.LatLng(44.974963, -93.260484), new google.maps.LatLng(44.975014,-93.260881),new google.maps.LatLng(44.975473,-93.262433), new google.maps.LatLng(44.976316, -93.261675), new google.maps.LatLng(44.979208, -93.268490), new google.maps.LatLng(44.976320, -93.270915), new google.maps.LatLng(44.977998, -93.274831), new google.maps.LatLng(44.978693, -93.275852),new google.maps.LatLng(44.978874, -93.276618), new google.maps.LatLng(44.979433, -93.277294), new google.maps.LatLng(44.980083, -93.277587),  new google.maps.LatLng(44.982150, -93.280471), new google.maps.LatLng(44.984593, -93.276953), 		new google.maps.LatLng(44.988675, -93.282880), new google.maps.LatLng(44.991125, -93.279470), new google.maps.LatLng(44.992006, -93.279777),new google.maps.LatLng(44.992070, -93.277016), new google.maps.LatLng(44.992504, -93.274887), new google.maps.LatLng(44.992988, -93.273245), new google.maps.LatLng(44.998962, -93.275200), new google.maps.LatLng(45.0131,-93.27501)                                 
+
+				]*/
+
+
+				/*var ward4 = [
+				new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.051232, -93.279236), new google.maps.LatLng(45.051267, -93.319497), new google.maps.LatLng(45.042159, -93.319420), new google.maps.LatLng(45.043099, -93.323582), new google.maps.LatLng(45.040279, -93.323625), new google.maps.LatLng(45.040219, -93.319291), new google.maps.LatLng(45.036428, -93.319184), new google.maps.LatLng(45.036428, -93.318862), new google.maps.LatLng(45.006029, -93.318465), new google.maps.LatLng(45.006029, -93.308852), new google.maps.LatLng(45.013189, -93.308917), new google.maps.LatLng(45.0131, -93.27501), 
+
+
+         
+
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLnng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLng(),
+				new google.maps.LatLnng(),
+				];*/
+
+			});
 		}
+
+		
 
 		function updateRaces(){
 			//only re-do everything if they have not changed the race box

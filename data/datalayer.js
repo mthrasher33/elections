@@ -6,7 +6,7 @@
             user: 'admin',
             password: '35THmeridian',
             database: 'election_results',
-            connectionLimit: 10
+            connectionLimit: 100
         };
 
     var pool = mysql.createPool(creds);
@@ -32,6 +32,7 @@
     this.getWards = function(idElection, callback){
          pool.getConnection(function(err,connection){
             connection.query('Select w.Ward_Name, w.Year_Start, w.Year_End, w.Boundaries, e.Date from Elections e Join Wards w on w.idCity = e.idCity Where idElection = ? And e.Date BETWEEN w.Year_Start AND w.Year_End;', idElection, function(err,rows,fields){ 
+                connection.release();
                 callback(err,rows,fields);
             });
         });       
