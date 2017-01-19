@@ -22,7 +22,7 @@
 
     this.getRaces = function(idElection, callback){
          pool.getConnection(function(err,connection){
-            connection.query('Select DISTINCT t.Name, c.City As Location, r.idRace from Races r Join Titles t on t.idTitles = r.idTitle Join Locations l on l.idLocations = r.idLocation Join Cities c on c.idCities = l.idCity Where r.idElection =3 UNION Select DISTINCT t.Name, w.Ward_Name, r.idRace from Races r Join Titles t on t.idTitles = r.idTitle Join Locations l on l.idLocations = r.idLocation Join Wards w  on w.idWard = l.idWard Where r.idElection =?;', idElection, function(err, rows, fields){
+            connection.query('Select DISTINCT t.Name, c.City As Location, r.idRace from Races r Join Titles t on t.idTitles = r.idTitle Join Locations l on l.idLocations = r.idLocation Join Cities c on c.idCities = l.idCity Where r.idElection =? UNION Select DISTINCT t.Name, w.Ward_Name, r.idRace from Races r Join Titles t on t.idTitles = r.idTitle Join Locations l on l.idLocations = r.idLocation Join Wards w  on w.idWard = l.idWard Where r.idElection =?;', [idElection,idElection], function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
             });
@@ -31,7 +31,7 @@
 
     this.getCandidates = function(idRace, callback){
         pool.getConnection(function(err,connection){
-            connection.query('Select c.idCandidate, ctr.idCandidates_To_Race, c.First, c.Middle, c.Nickname, c.Last, c.Name_Suffix from Candidates c Join Candidates_To_Race ctr ON ctr.idCandidate = c.idCandidate Where ctr.idRace = ?;', idRace, function(err, rows, fields){
+            connection.query('Select c.idCandidate, ctr.idCandidates_To_Race, c.First, c.Middle, c.Nickname, c.Last, c.Name_Suffix, ctr.FPTP_Votes_Total, ctr.RC_First_Place_Votes_Total, ctr.RC_Second_Place_Votes_Total, ctr.RC_Third_Place_Votes_Total from Candidates c Join Candidates_To_Race ctr ON ctr.idCandidate = c.idCandidate Where ctr.idRace = ? Order By ctr.FPTP_Votes_Total DESC, ctr.RC_First_Place_Votes_Total DESC, ctr.RC_Second_Place_Votes_Total DESC, ctr.RC_Third_Place_Votes_Total DESC;', idRace, function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
 
