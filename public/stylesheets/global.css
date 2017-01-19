@@ -30,6 +30,10 @@ input.year {
 	min-width: 160px;
 }
 
+.marker-labes {
+    color: white;
+}
+
 .display-none {
     display:none;
 }
