@@ -41,11 +41,20 @@
 
     this.getWards = function(idElection, callback){
          pool.getConnection(function(err,connection){
-            connection.query('Select w.Ward_Name, w.Year_Start, w.Year_End, w.Boundaries, e.Date from Elections e Join Wards w on w.idCity = e.idCity Where idElection = ? And e.Date BETWEEN w.Year_Start AND w.Year_End;', idElection, function(err,rows,fields){ 
+            connection.query('Select w.Ward_Name, w.Year_Start, w.Year_End, w.Boundaries, w.Center, e.Date from Elections e Join Wards w on w.idCity = e.idCity Where idElection = ? And e.Date BETWEEN w.Year_Start AND w.Year_End;', idElection, function(err,rows,fields){ 
                 connection.release();
                 callback(err,rows,fields);
             });
         });       
+    }
+
+    this.getWardLocation = function(idRace, callback){
+        pool.getConnection(function(err,connection){
+            connection.query('Select w.Center from Races r Join Locations l on l.idLocations = r.idLocation Join Wards w on w.idWard = l.idWard where r.idRace = ?;', idRace, function(err,rows,fields){
+                connection.release();
+                callback(err,rows,fields);
+            });
+        });
     }
 
 

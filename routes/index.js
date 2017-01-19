@@ -110,6 +110,20 @@ router.get('/getWards/:electionID', function(req,res){
 });
 
 
+//returns the center of the ward for the race selected
+router.get('/getWardLocation/:raceID', function(req, res){
+    var raceID = req.params.raceID;
+    datalayer.getWardLocation(raceID, function(err,rows,fields){
+        if(!err) {
+            res.send({ward: rows});
+            //console.log(rows);
+        } else {
+            console.log('Error while performing Query: ' + err);
+        }
+    });
+});
+
+
 /*POST to check if user input is in database*/
 router.post('/getPrecincts', function (req, res) {
     // console.log("POST METHOD:");
