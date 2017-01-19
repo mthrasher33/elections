@@ -22,7 +22,7 @@
 
     this.getRaces = function(idElection, callback){
          pool.getConnection(function(err,connection){
-            connection.query('Select DISTINCT t.Name from Races r Join Titles t on t.idTitles = r.idTitle Join Locations l on l.idLocations = r.idLocation Where r.idElection =?;', idElection, function(err, rows, fields){
+            connection.query('Select DISTINCT t.Name, r.idRace from Races r Join Titles t on t.idTitles = r.idTitle Join Locations l on l.idLocations = r.idLocation Where r.idElection =?;', idElection, function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
             });

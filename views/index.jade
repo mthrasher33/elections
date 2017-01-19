@@ -14,21 +14,11 @@ block content
 						label(for='sYears') Year
 						select.form-control#sYears
 							for year, i in years
-								option.dropdown-item(value="#{years[i].idElection}") #{years[i].Year}
-								//span.display-none #{years[i].idElection}
-					//form(name="get_precincts", method="post", action="/getPrecincts")#getPrecincts
-					//div.btn-group
-					//	input(type="button", data-toggle="dropdown", aria-haspopup="true", aria-expanded="false", value="Year").btn.btn-danger.dropdown-toggle.year 
-					//		ul
-					//		for year, i in years
-					//			li.dropdown-item #{years[i].Year} 
-					//				span.display-none #{years[i].idElection}
+								option.dropdown-item(value="#{years[i].idElection}") #{years[i].Year}					
 					div.form-group
 						label(for='sYears') Race
 						select.form-control#sRaces
-							//for year, i in years
-							//	option #{years[i].Year}
-							//	span.display-none #{years[i].idElection}
+
 block script
 	script(type='text/javascript').
 		var allShapes = [];
@@ -180,7 +170,7 @@ block script
 					
 					//populate dropdown menu from returned data
 					$.each(data.races, function(i, value){
-						$('select#sRaces').append($('<option>').text(value.Name).attr('value',value));
+						$('select#sRaces').append($('<option>').text(value.Name).attr('value',value.idRace));
 					});
 					//console.log(data.races);
 				});
