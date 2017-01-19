@@ -57,7 +57,6 @@ block script
 			//first clear all the shapes on the map
 			
 			for (var i=0; i<allShapes.length; i++){
-				console.log(allShapes[i]);
 				allShapes[i].setMap(null);
 				//allShapes.pop();
 				//allShapes.splice(i, 1);
@@ -117,7 +116,7 @@ block script
 				});
 
 				//print the length of the all shapes array even if we don't have any data in the election year to which we changed
-				console.log(allShapes.length);
+				//console.log(allShapes.length);
 
 
 
@@ -162,17 +161,17 @@ block script
 			//only re-do everything if they have not changed the race box
 				//if($('select#sRace').index()>0 && $('select#sRace').length != 0){
 				var selected = $('select#sYears').val();
-				//$('form#getPrecincts').submit();
 				$.getJSON("/getRaces/" + selected, function(data){
-					//$('#matt').html(data.matt);
+
+					//clean out the dropdown menu
 					$('select#sRaces').children().remove().end();
 
 					
 					//populate dropdown menu from returned data
 					$.each(data.races, function(i, value){
-						$('select#sRaces').append($('<option>').text(value.Name).attr('value',value.idRace));
+						console.log(value.idRace);
+						$('select#sRaces').append($('<option>').text(value.Name + ' ' + value.Location).attr('value', value.idRace));
 					});
-					//console.log(data.races);
 				});
 				//}
 		}

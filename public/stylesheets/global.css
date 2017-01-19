@@ -54,6 +54,10 @@ input.year {
 
 }
 
+select#sRaces {
+    font-size:6px;
+}
+
 input.dropdown-toggle::after {
     display: inline-block;
     width: 0;
