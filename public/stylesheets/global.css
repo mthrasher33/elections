@@ -9,7 +9,62 @@ div#map {
 	height: 765px;
     width: 100%;
     background-color: #d9d9d9;
+    position:relative;
 }
+
+    div#ward-legend {
+        position: absolute;
+        top: 95px;
+        left: 25px;
+        width: 107px;
+        height: 94px;
+        background-color: #ffffff;
+        z-index: 5;
+        border-radius: 5px;
+        font-family: "Roboto";
+        box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+        font-size: 11px;
+        display: none;
+    }
+
+        div#ward-legend ul {
+            list-style: none;
+            margin-left: -30px;
+        }
+
+            div#ward-legend ul li, div#ward-legend ul span {
+                border-bottom: 1px solid #d9d9d9;
+                margin-left: -10px;
+                padding-left: 11px;
+                padding-top: 4px;
+                padding-bottom: 4px;
+                cursor: pointer;
+            }
+
+            div#ward-legend ul li:hover {
+                background-color:#B9E7FF;
+                font-weight:bold;
+            }
+
+            div#ward-legend ul li:first-child {
+                border-radius: 5px 5px 0px 0px;
+            }
+
+            div#ward-legend ul li:last-child {
+                border-radius: 0px 0px 5px 5px;
+            }
+
+            div#ward-legend ul li:last-child, div#ward-legend ul span {
+                border-bottom: none;
+            }
+
+            div#ward-legend a {
+                color: black;
+            }
+
+            div#ward-legend a:hover {
+                text-decoration: none;
+            }
 
 h1.map-title {
     font-family: 'Josefin Sans', sans-serif;
