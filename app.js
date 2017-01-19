@@ -9,6 +9,7 @@ var routes = require('./routes/index');
 var GoogleMapsAPI = require('googlemaps');
 var jade = require('jade');
 var moment = require('moment');
+var MarkerWithLabel = require('markerwithlabel');
 
 
 var app = express();

@@ -4,6 +4,7 @@ var mysql = require('mysql');
 var GoogleMapsAPI = require('googlemaps');
 var datalayer = require('../data/datalayer.js');
 var moment = require('moment');
+var MarkerWithLabel = require('markerwithlabel');
 
 
 //var nodemailer = require('nodemailer');
