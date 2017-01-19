@@ -220,6 +220,9 @@ block script
 
 									$('select#sRaces option:contains(' + this.name + ' )').prop('selected', true);	
 								//$('select#sRaces options').filter(function(){alert($(this))}.text())};
+
+								//trigger update candidates to show the new race
+								updateCandidates();
 								//MUST TRIGGER THE DRAW PRECINCTS FUNCTION AFTER THIS
 
 							}
