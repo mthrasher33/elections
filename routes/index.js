@@ -82,6 +82,16 @@ router.get('/getRaces/:raceID', function(req,res){
     });
 });
 
+router.get('/getCandidates/:raceID', function(req, res){
+    datalayer.getCandidates(req.params.raceID, function(err, rows, fields){
+        if(!err){
+            res.send({candidates: rows});
+        } else {
+            console.log('Error while performing Query: ' + err);
+        }
+    })
+})
+
 //returns the shape of the wards that are drawn on the map
 router.get('/getWards/:electionID', function(req,res){
     //var electionDate = req.params.electionYear + "-12-31 23:59:59";

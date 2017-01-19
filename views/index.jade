@@ -18,6 +18,9 @@ block content
 					div.form-group
 						label(for='sYears') Race
 						select.form-control#sRaces
+					div.form-group
+						label(for='sCandidats') Candidates
+						select.form-control#sCandidates
 
 block script
 	script(type='text/javascript').
@@ -42,6 +45,10 @@ block script
 			$('select#sYears').change(function(){
 				drawWards();
 				updateRaces();
+			});
+
+			$('select#sRaces').change(function(){
+				updateCandidates();
 			});
 
 		//});
@@ -105,7 +112,6 @@ block script
 							for (var i=0; i<len; i++){
 								htmlStr += ("new google.maps.LatLng(" +wardDesign.getPath().getAt(i).toUrlValue(5) + "), "); 
 							}
-							console.log(htmlStr);
 						});
 
 					allShapes.push(wardDesign);
@@ -169,10 +175,31 @@ block script
 					
 					//populate dropdown menu from returned data
 					$.each(data.races, function(i, value){
-						console.log(value.idRace);
 						$('select#sRaces').append($('<option>').text(value.Name + ' ' + value.Location).attr('value', value.idRace));
 					});
+
+					//set the first one to selected
+					//$('select#sraces :nth-child(0)').prop('selected', true);
+
+					//update the candidate list
+					updateCandidates();
+
 				});
 				//}
+
+		}
+
+
+		function updateCandidates(){
+			var selected = $('select#sRaces').val();
+			console.log("raceID : " + selected);
+			$.getJSON("/getCandidates/" + selected, function(data){
+				$('select#sCandidates').children().remove().end();
+				//console.log("data : " + data);
+				//populate dropdown menu from retrieved data
+				$.each(data.candidates, function(i, value){
+					$('select#sCandidates').append($('<option>').text(value.First + ' ' + value.Last).attr('value', value.idCandidate));
+				});
+			})
 		}
 	script(async, defer, src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiT0h95IpSJ4N3YNhyFnEcEHrv4ruz4SY&callback=initMap")

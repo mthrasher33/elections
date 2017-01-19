@@ -29,6 +29,16 @@
         });       
     }
 
+    this.getCandidates = function(idRace, callback){
+        pool.getConnection(function(err,connection){
+            connection.query('Select c.idCandidate, ctr.idCandidates_To_Race, c.First, c.Middle, c.Nickname, c.Last, c.Name_Suffix from Candidates c Join Candidates_To_Race ctr ON ctr.idCandidate = c.idCandidate Where ctr.idRace = ?;', idRace, function(err, rows, fields){
+                connection.release();
+                callback(err,rows,fields);
+
+            });
+        })
+    }
+
     this.getWards = function(idElection, callback){
          pool.getConnection(function(err,connection){
             connection.query('Select w.Ward_Name, w.Year_Start, w.Year_End, w.Boundaries, e.Date from Elections e Join Wards w on w.idCity = e.idCity Where idElection = ? And e.Date BETWEEN w.Year_Start AND w.Year_End;', idElection, function(err,rows,fields){ 
