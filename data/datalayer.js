@@ -41,7 +41,7 @@
 
     this.getWards = function(idElection, callback){
          pool.getConnection(function(err,connection){
-            connection.query('Select w.Ward_Name, w.Year_Start, w.Year_End, w.Boundaries, w.Center, e.Date from Elections e Join Wards w on w.idCity = e.idCity Where idElection = ? And e.Date BETWEEN w.Year_Start AND w.Year_End;', idElection, function(err,rows,fields){ 
+            connection.query('Select w.idWard, w.Ward_Name, w.Year_Start, w.Year_End, w.Boundaries, w.Center, e.Date from Elections e Join Wards w on w.idCity = e.idCity Where idElection = ? And e.Date BETWEEN w.Year_Start AND w.Year_End;', idElection, function(err,rows,fields){ 
                 connection.release();
                 callback(err,rows,fields);
             });
@@ -58,9 +58,9 @@
     }
 
 
-    this.getPrecincts = function(callback) {
+    this.getPrecincts = function(idWard, callback) {
         pool.getConnection(function(err,connection){
-            connection.query('call spElectionResults_City_Total(3); ', function(err, rows, fields){
+            connection.query('Select * From Precincts where idWard = ?', idWard, function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
             });

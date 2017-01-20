@@ -124,17 +124,12 @@ router.get('/getWardLocation/:raceID', function(req, res){
 });
 
 
-/*POST to check if user input is in database*/
-router.post('/getPrecincts', function (req, res) {
-    // console.log("POST METHOD:");
-    // console.log(req.body.typeahead) //returns what the user typed in the box
-
-    //connect to database and search the input in the address column
-    datalayer.getPrecincts(function (err, rows, fields) {
+//returns the precicnts for the requested ward
+router.get('/getPrecincts/:wardID', function (req, res) {
+    var wardID = req.params.wardID
+    datalayer.getPrecincts(wardID, function (err, rows, fields) {
         if(!err){
-            res.render('index', {precincts: rows});
-//            console.log(rows);
-
+            res.send({precincts: rows});
         } else {
             console.log('Error while performing Query: ' + err);
         }
