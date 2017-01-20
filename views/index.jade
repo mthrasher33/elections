@@ -82,28 +82,24 @@ block script
 						if(data.ward[0].Center){
 							data.ward = (data.ward[0].Center).split(/[()]+/).filter(function(e) { return e; });
 							data.ward = getLatLngFromString(data.ward[1]);
-							map.panTo(data.ward);
+
 							map.setZoom(14);
 
-							removePrecincts();
-							//drawPrecincts();
-
-							//console.log("All shapes: ");
-							//console.log(allShapes);
-							allShapes.forEach(function(shape){
-								console.log(data);
-								if(google.maps.geometry.poly.containsLocation(data.ward, shape)){
-									console.log(shape);
-									drawPrecincts(shape);
-								}  
-							});
-
-							//go find the shape that corresponds to the ward
-							//and then draw the precincts for the ward
+							//only draw the precincts if the map moves
+							//prevents precincts from flickering on drop down select
+							if(map.getCenter() !== data.ward){
+								removePrecincts();
+								allShapes.forEach(function(shape){
+									if(google.maps.geometry.poly.containsLocation(data.ward, shape)){
+										console.log(shape);
+										drawPrecincts(shape);
+									}  
+								});
+							}
 						}
-						//also make the ward menu visible
+						//also make the ward menu visible and recenter the map
 						$('div#ward-legend').css('display', 'block');
-
+						map.panTo(data.ward);
 					}
 
 				});
@@ -219,14 +215,10 @@ block script
 
 					//add event listener to the ward
 						google.maps.event.addListener(wardDesign, 'click', function(event){
-							//delete other drawn precincts
-							removePrecincts();
 
 							//DO NOT DELETE THIS CONSOLE.LOG
 							console.log('new google.maps.LatLng(' + this.center.lat() + ',' + this.center.lng() + '),');
 							var center = this.center;
-							//map.panTo(center)
-							map.setCenter(center);
 							map.setZoom(14);
 							
 							//show the ward legend
@@ -246,22 +238,49 @@ block script
 
 							}
 
-							//MUST TRIGGER THE DRAW PRECINCTS FUNCTION AFTER THIS
-							drawPrecincts(this);
+							//Draw the precincts for the shape the marker is in
+							//but only do this if the map moves
+							
+							if(map.getCenter() !== this.center){
+								removePrecincts();
+								
+								allShapes.forEach(function(shape){
+									if(google.maps.geometry.poly.containsLocation(center, shape)){
+										console.log(shape);
+										drawPrecincts(shape);
+									}  
+								});
+							}
+							//set the new center at the end so that
+							//we can compare the new one to the old one
+							map.setCenter(center);
 						});
 
 						google.maps.event.addListener(marker, 'click', function(event){
 							console.log('(' + this.center.lat() + ',' + this.center.lng() + ')');
 							var center = this.center;
 							//map.panTo(center)
-							map.setCenter(center);
 							map.setZoom(14);
 							$('div#ward-legend').css('display', 'block');
 							
 
 							//Draw the precincts for the shape the marker is in
-							removePrecincts();
-							drawPrecincts(this);	
+							//but only do this if the map moves
+							
+							if(map.getCenter() !== this.center){
+								removePrecincts();
+								
+								allShapes.forEach(function(shape){
+									if(google.maps.geometry.poly.containsLocation(center, shape)){
+										console.log(shape);
+										drawPrecincts(shape);
+									}  
+								});
+							}
+							//set the new center at the end so that
+							//we can compare the new one to the old one
+							map.setCenter(center);
+
 						});
 
 					//marker.setVisible(false);
@@ -276,43 +295,7 @@ block script
 
 				});
 
-
-
-
-
-				//var ward1 = [new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(45.0131,-93.26325), new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.03555,-93.23892), new google.maps.LatLng(45.03555,-93.22694), new google.maps.LatLng(45.01306,-93.22694), new google.maps.LatLng(45.01306,-93.21353), new google.maps.LatLng(45.00586,-93.21353), new google.maps.LatLng(45.00604,-93.206252), new google.maps.LatLng(45.00604,-93.206252), new google.maps.LatLng(44.99185,-93.206252), new google.maps.LatLng(44.988077,-93.206252), new google.maps.LatLng(44.987851, -93.233322), new google.maps.LatLng(44.991508,-93.23334), new google.maps.LatLng(44.991508,-93.23722), new google.maps.LatLng(44.99882,-93.23722), new google.maps.LatLng(44.99882,-93.24675) ];
-
-				//var ward1prec1 = [new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.032709, -93.281750), new google.maps.LatLng(45.032800, -93.281063), new google.maps.LatLng(45.027644, -93.278016), new google.maps.LatLng(45.027614, -93.26325),  new google.maps.LatLng(45.013128, -93.26325)]
-
-				//var ward2 = [new google.maps.LatLng(44.988077,-93.206252), new google.maps.LatLng(44.987851, -93.233322), new google.maps.LatLng(44.991508,-93.23334), new google.maps.LatLng(44.991508,-93.242014), new google.maps.LatLng(44.98934,-93.23918), new google.maps.LatLng(44.98502,-93.2316), new google.maps.LatLng(44.98084,-93.23454), new google.maps.LatLng(44.98288,-93.23999), new google.maps.LatLng(44.97904,-93.24341), new google.maps.LatLng(44.97973,-93.24563), new google.maps.LatLng(44.97042,-93.24593), new google.maps.LatLng(44.96881,-93.242014), new google.maps.LatLng(44.96514,-93.242014), new google.maps.LatLng(44.96495,-93.23382), new google.maps.LatLng(44.96461,-93.2331), new google.maps.LatLng(44.96482,-93.22869), new google.maps.LatLng(44.9649,-93.22713), new google.maps.LatLng(44.95975,-93.22694), new google.maps.LatLng(44.95976,-93.24633), new google.maps.LatLng(44.95613,-93.24357), new google.maps.LatLng(44.95613,-93.24099), new google.maps.LatLng(44.95516,-93.2403), new google.maps.LatLng(44.95553,-93.23936), new google.maps.LatLng(44.95431,-93.23829), new google.maps.LatLng(44.95437,-93.23629), new google.maps.LatLng(44.95367,-93.23649), new google.maps.LatLng(44.95424,-93.23505), new google.maps.LatLng(44.94917,-93.23476), new google.maps.LatLng(44.94181,-93.22921), new google.maps.LatLng(44.94174,-93.19859), new google.maps.LatLng(44.94864,-93.19882), new google.maps.LatLng(44.95419,-93.206252) ];
-
-				/*var ward3 = [new google.maps.LatLng(45.0131,-93.27501),new google.maps.LatLng(45.0131,-93.26325),new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(44.99882,-93.23722), google.maps.LatLng(44.991508,-93.23722), new google.maps.LatLng(44.991508,-93.242014), new google.maps.LatLng(44.98934,-93.23918), new google.maps.LatLng(44.98502,-93.2316), new google.maps.LatLng(44.98084,-93.23454), new google.maps.LatLng(44.98288,-93.23999), new google.maps.LatLng(44.97904,-93.24341), new google.maps.LatLng(44.97973,-93.24563), new google.maps.LatLng(44.970214, -93.253267), new google.maps.LatLng(44.973278, -93.260593), new google.maps.LatLng(44.973967, -93.259979),  new google.maps.LatLng(44.974554, -93.259943), new google.maps.LatLng(44.97973,-93.24563), new google.maps.LatLng(44.974963, -93.260484), new google.maps.LatLng(44.975014,-93.260881),new google.maps.LatLng(44.975473,-93.262433), new google.maps.LatLng(44.976316, -93.261675), new google.maps.LatLng(44.979208, -93.268490), new google.maps.LatLng(44.976320, -93.270915), new google.maps.LatLng(44.977998, -93.274831), new google.maps.LatLng(44.978693, -93.275852),new google.maps.LatLng(44.978874, -93.276618), new google.maps.LatLng(44.979433, -93.277294), new google.maps.LatLng(44.980083, -93.277587),  new google.maps.LatLng(44.982150, -93.280471), new google.maps.LatLng(44.984593, -93.276953), 		new google.maps.LatLng(44.988675, -93.282880), new google.maps.LatLng(44.991125, -93.279470), new google.maps.LatLng(44.992006, -93.279777),new google.maps.LatLng(44.992070, -93.277016), new google.maps.LatLng(44.992504, -93.274887), new google.maps.LatLng(44.992988, -93.273245), new google.maps.LatLng(44.998962, -93.275200), new google.maps.LatLng(45.0131,-93.27501)                                 
-
-				]*/
-
-
-				/*var ward4 = [
-				new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.051232, -93.279236), new google.maps.LatLng(45.051267, -93.319497), new google.maps.LatLng(45.042159, -93.319420), new google.maps.LatLng(45.043099, -93.323582), new google.maps.LatLng(45.040279, -93.323625), new google.maps.LatLng(45.040219, -93.319291), new google.maps.LatLng(45.036428, -93.319184), new google.maps.LatLng(45.036428, -93.318862), new google.maps.LatLng(45.006029, -93.318465), new google.maps.LatLng(45.006029, -93.308852), new google.maps.LatLng(45.013189, -93.308917), new google.maps.LatLng(45.0131, -93.27501), 
-
-
-         
-
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLnng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLng(),
-				new google.maps.LatLnng(),
-				];*/
-
+			
 			});
 		}
 
@@ -392,7 +375,17 @@ block script
 			}
 		}
 
-		
+		var ward1prec1 = [new google.maps.LatLng(45.027614, -93.26325),  new google.maps.LatLng(45.013128, -93.26325), new google.maps.LatLng(45.0131,-93.27501),new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.035478, -93.247384), new google.maps.LatLng(45.025741, -93.247384), new google.maps.LatLng(45.024240, -93.250904), new google.maps.LatLng(45.024711, -93.254364),new google.maps.LatLng(45.024926, -93.258673), new google.maps.LatLng(45.027628, -93.260129), ]
+
+		var ward1prec2 = [ new google.maps.LatLng(45.035478, -93.247384), new google.maps.LatLng(45.03555,-93.22694),new google.maps.LatLng(45.025955,-93.226994),new google.maps.LatLng(45.025741, -93.247384)   ]
+
+		var ward1prec3 = [new google.maps.LatLng(45.025741, -93.247384), google.maps.LatLng(45.025955,-93.226994), google.maps.LatLng(45.018920, -93.22694), google.maps.LatLng(45.019273, -93.229649), google.maps.LatLng(45.018682, -93.230100), google.maps.LatLng(45.018591, -93.247416),]
+
+		var ward1prec4 = [ google.maps.LatLng(45.018920, -93.22694), google.maps.LatLng(45.019273, -93.229649), google.maps.LatLng(45.018682, -93.230100), google.maps.LatLng(45.018591, -93.247416), google.maps.LatLng(45.013191, -93.247352), google.maps.LatLng(45.01306,-93.22694) ,   ]
+
+		var ward1prec5 = [google.maps.LatLng(45.013191, -93.247367), google.maps.LatLng(45.013126, -93.237159),new google.maps.LatLng(44.99882,-93.23722),  google.maps.LatLng(44.998860, -93.247303) ];
+
+		var ward1 = [new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(45.0131,-93.26325), new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.03555,-93.23892), new google.maps.LatLng(45.03555,-93.22694), new google.maps.LatLng(45.01306,-93.22694), new google.maps.LatLng(45.01306,-93.21353), new google.maps.LatLng(45.00586,-93.21353), new google.maps.LatLng(45.00604,-93.206252), new google.maps.LatLng(45.00604,-93.206252), new google.maps.LatLng(44.99185,-93.206252), new google.maps.LatLng(44.988077,-93.206252), new google.maps.LatLng(44.987851, -93.233322), new google.maps.LatLng(44.991508,-93.23334), new google.maps.LatLng(44.991508,-93.23722), new google.maps.LatLng(44.99882,-93.23722), new google.maps.LatLng(44.99882,-93.24675)] 
 
 		function updateRaces(){
 			//only re-do everything if they have not changed the race box
@@ -414,11 +407,7 @@ block script
 
 					//update the candidate list
 					updateCandidates();
-
-
 				});
-				//}
-
 		}
 
 
