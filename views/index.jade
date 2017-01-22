@@ -6,7 +6,7 @@ block content
 		div.row.map-holder
 			div.col-xs-12
 				h1.map-title Minneapolis Map
-			div.col-xs-10
+			div.col-xs-9
 				div#map
 				div#ward-legend
 					ul
@@ -18,7 +18,7 @@ block content
 							a(href='#') Contact
 						li
 							span#back-to-city Back to City View
-			div.col-xs-2
+			div.col-xs-3
 				div#form
 					div.form-group
 						label(for='sYears') Year
@@ -28,9 +28,14 @@ block content
 					div.form-group
 						label(for='sYears') Race
 						select.form-control#sRaces
+
 					div.form-group
 						label(for='sCandidats') Candidates
 						select.form-control#sCandidates
+
+					div.race-results
+						ul.list
+						
 
 block script
 	script(type='text/javascript').
@@ -41,10 +46,8 @@ block script
 		var minneapolis_lat = 44.98154;
 		var minneapolis_lng = -93.270718;
 
-
 		//$(document).ready(function() {
 			updateRaces();
-			drawWards();
 
 			var map;
 			function initMap(){
@@ -52,7 +55,94 @@ block script
 				map = new google.maps.Map(document.getElementById('map'), {
 					center: {lat: minneapolis_lat, lng: minneapolis_lng},
 					zoom: 12,
-					styles: [{"featureType":"poi","elementType":"all","stylers":[{"hue":"#000000"},{"saturation":-100},{"lightness":-100},{"visibility":"off"}]},{"featureType":"poi","elementType":"all","stylers":[{"hue":"#000000"},{"saturation":-100},{"lightness":-100},{"visibility":"off"}]},{"featureType":"administrative","elementType":"all","stylers":[{"hue":"#000000"},{"saturation":0},{"lightness":-100},{"visibility":"off"}]},{"featureType":"road","elementType":"labels","stylers":[{"hue":"#ffffff"},{"saturation":-100},{"lightness":100},{"visibility":"off"}]},{"featureType":"water","elementType":"labels","stylers":[{"hue":"#000000"},{"saturation":-100},{"lightness":-100},{"visibility":"off"}]},{"featureType":"road.local","elementType":"all","stylers":[{"hue":"#ffffff"},{"saturation":-100},{"lightness":100},{"visibility":"on"}]},{"featureType":"water","elementType":"geometry","stylers":[{"hue":"#ffffff"},{"saturation":-100},{"lightness":100},{"visibility":"on"}]},{"featureType":"transit","elementType":"labels","stylers":[{"hue":"#000000"},{"saturation":0},{"lightness":-100},{"visibility":"off"}]},{"featureType":"landscape","elementType":"labels","stylers":[{"hue":"#000000"},{"saturation":-100},{"lightness":-100},{"visibility":"off"}]},{"featureType":"road","elementType":"geometry","stylers":[{"hue":"#bbbbbb"},{"saturation":-100},{"lightness":26},{"visibility":"on"}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"hue":"#dddddd"},{"saturation":-100},{"lightness":-3},{"visibility":"on"}]}]					
+					styles: [
+					    {
+					        "featureType": "administrative",
+					        "elementType": "labels.text.fill",
+					        "stylers": [
+					            {
+					                "color": "#444444"
+					            }
+					        ]
+					    },
+					     {
+						    "featureType": "administrative.neighborhood",
+						    "elementType": "labels",
+						    "stylers": [
+						      { "visibility": "off" }
+						    ]
+						},
+
+					    {
+					        "featureType": "landscape",
+					        "elementType": "all",
+					        "stylers": [
+					            {
+					                "color": "#f2f2f2"
+					            }
+					        ]
+					    },
+					    {
+					        "featureType": "poi",
+					        "elementType": "all",
+					        "stylers": [
+					            {
+					                "visibility": "off"
+					            }
+					        ]
+					    },
+					    {
+					        "featureType": "road",
+					        "elementType": "all",
+					        "stylers": [
+					            {
+					                "saturation": -100
+					            },
+					            {
+					                "lightness": 45
+					            }
+					        ]
+					    },
+					    {
+					        "featureType": "road.highway",
+					        "elementType": "all",
+					        "stylers": [
+					            {
+					                "visibility": "simplified"
+					            }
+					        ]
+					    },
+					    {
+					        "featureType": "road.arterial",
+					        "elementType": "labels.icon",
+					        "stylers": [
+					            {
+					                "visibility": "off"
+					            }
+					        ]
+					    },
+					    {
+					        "featureType": "transit",
+					        "elementType": "all",
+					        "stylers": [
+					            {
+					                "visibility": "off"
+					            }
+					        ]
+					    },
+					    {
+					        "featureType": "water",
+					        "elementType": "all",
+					        "stylers": [
+					            {
+					                "color": "#46bcec"
+					            },
+					            {
+					                "visibility": "on"
+					            }
+					        ]
+					    }
+					]
 				});				
 			};
 
@@ -61,11 +151,11 @@ block script
 			$('select#sYears').change(function(){
 				//only change everything if the map is zoomed out
 				if(map.center.lat() === minneapolis_lat && map.center.lng() === minneapolis_lng);
-				drawWards();
-				updateRaces(); //this function calls updateCandidates();
+					//drawWards();
+					updateRaces(); //this function calls updateCandidates();
 
-				//do this no matter if the map is zoomed in or not
-				//getResults();
+					//do this no matter if the map is zoomed in or not
+					//getResults();
 
 			});
 
@@ -91,7 +181,6 @@ block script
 								removePrecincts();
 								allShapes.forEach(function(shape){
 									if(google.maps.geometry.poly.containsLocation(data.ward, shape)){
-										console.log(shape);
 										drawPrecincts(shape);
 									}  
 								});
@@ -122,9 +211,14 @@ block script
 			return new google.maps.LatLng(parseFloat(latlng[0]), parseFloat(latlng[1])); 
 		}
 
+		//gets the points for the wards, but no colors
+		//colors come from updateResults()
+		//calls updateresults() when finished
 		function drawWards(){
+			console.log('draw wards is called');
 			var selected = $('select#sYears option:selected').val();
-
+			console.log('allShapes before remove wards called: ');
+			console.log(allShapes);
 			removeWards();
 			
 			//removePrecincts();
@@ -165,13 +259,14 @@ block script
 						    paths: wardCoords,
 						    //draggable: true, // turn off if it gets annoying
 						    //editable: true,
-						    strokeColor: '#FF0000',
-						    strokeOpacity: 0.8,
-						    strokeWeight: 2,
-						    fillColor: '#FF0000',
-						    fillOpacity: 0.35
+						    //strokeColor: '#FF0000',
+						    //strokeOpacity: 0.8,
+						    strokeWeight: 0,
+						    fillColor: '#FFFFFF'
+						    //fillOpacity: 0.35
 						});
 
+					console.log("shape to be added: ");
 					//add the ward label to the map if we are showing wards
 					var showWards = true;
 
@@ -201,7 +296,6 @@ block script
 
 					//this should be the center that you can pass to a new map
 					//add it to the ward polygon and the marker for re-focus
-					//console.log(bounds.getCenter());
 					wardDesign['center'] = bounds.getCenter();
 					wardDesign['name'] = ward.Ward_Name; 
 					wardDesign['id'] = ward.idWard;
@@ -209,7 +303,6 @@ block script
 
 
 					//here it is in a readable format
-					//console.log('Lat: ' + bounds.getCenter().lat() +  ' Long: ' + bounds.getCenter().lng()); 
 
 
 
@@ -246,7 +339,6 @@ block script
 								
 								allShapes.forEach(function(shape){
 									if(google.maps.geometry.poly.containsLocation(center, shape)){
-										console.log(shape);
 										drawPrecincts(shape);
 									}  
 								});
@@ -257,7 +349,6 @@ block script
 						});
 
 						google.maps.event.addListener(marker, 'click', function(event){
-							console.log('(' + this.center.lat() + ',' + this.center.lng() + ')');
 							var center = this.center;
 							//map.panTo(center)
 							map.setZoom(14);
@@ -272,7 +363,6 @@ block script
 								
 								allShapes.forEach(function(shape){
 									if(google.maps.geometry.poly.containsLocation(center, shape)){
-										console.log(shape);
 										drawPrecincts(shape);
 									}  
 								});
@@ -293,21 +383,16 @@ block script
 
 					}
 
-				});
 
-			
+
+				});
+					//the last thing we do is paint the results on the wards/precincts
+					updateResults();
+
 			});
 		}
 
 		function drawPrecincts(wardDesign){
-			//removeWards();
-			
-			//if you want these precincts to replace all the other precincts on the map
-
-			//if(replaceAll){
-			//	removePrecincts();
-			//}
-
 			$.getJSON("/getPrecincts/" + wardDesign.id, function(data){
 				if(data){
 					(data.precincts).forEach(function(precinct){
@@ -367,60 +452,112 @@ block script
 		//first clear all the shapes on the map
 		function removeWards(){
 			for (var i=0; i<allShapes.length; i++){
+				console.log('shape being removed: ');
+				console.log(allShapes[i]);
 				allShapes[i].setMap(null);
 				allMarkers[i].setMap(null);
-				allShapes = [];
-				allMarkes = [];
-
 			}
+
+			allShapes = [];
+			allMarkes = [];
 		}
 
-		var ward1prec1 = [new google.maps.LatLng(45.027614, -93.26325),  new google.maps.LatLng(45.013128, -93.26325), new google.maps.LatLng(45.0131,-93.27501),new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.035478, -93.247384), new google.maps.LatLng(45.025741, -93.247384), new google.maps.LatLng(45.024240, -93.250904), new google.maps.LatLng(45.024711, -93.254364),new google.maps.LatLng(45.024926, -93.258673), new google.maps.LatLng(45.027628, -93.260129), ]
-
-		var ward1prec2 = [ new google.maps.LatLng(45.035478, -93.247384), new google.maps.LatLng(45.03555,-93.22694),new google.maps.LatLng(45.025955,-93.226994),new google.maps.LatLng(45.025741, -93.247384)   ]
-
-		var ward1prec3 = [new google.maps.LatLng(45.025741, -93.247384), google.maps.LatLng(45.025955,-93.226994), google.maps.LatLng(45.018920, -93.22694), google.maps.LatLng(45.019273, -93.229649), google.maps.LatLng(45.018682, -93.230100), google.maps.LatLng(45.018591, -93.247416),]
-
-		var ward1prec4 = [ google.maps.LatLng(45.018920, -93.22694), google.maps.LatLng(45.019273, -93.229649), google.maps.LatLng(45.018682, -93.230100), google.maps.LatLng(45.018591, -93.247416), google.maps.LatLng(45.013191, -93.247352), google.maps.LatLng(45.01306,-93.22694) ,   ]
-
-		var ward1prec5 = [google.maps.LatLng(45.013191, -93.247367), google.maps.LatLng(45.013126, -93.237159),new google.maps.LatLng(44.99882,-93.23722),  google.maps.LatLng(44.998860, -93.247303) ];
-
-		var ward1 = [new google.maps.LatLng(44.99878,-93.26334), new google.maps.LatLng(45.0131,-93.26325), new google.maps.LatLng(45.0131,-93.27501), new google.maps.LatLng(45.03555,-93.28273), new google.maps.LatLng(45.03555,-93.23892), new google.maps.LatLng(45.03555,-93.22694), new google.maps.LatLng(45.01306,-93.22694), new google.maps.LatLng(45.01306,-93.21353), new google.maps.LatLng(45.00586,-93.21353), new google.maps.LatLng(45.00604,-93.206252), new google.maps.LatLng(45.00604,-93.206252), new google.maps.LatLng(44.99185,-93.206252), new google.maps.LatLng(44.988077,-93.206252), new google.maps.LatLng(44.987851, -93.233322), new google.maps.LatLng(44.991508,-93.23334), new google.maps.LatLng(44.991508,-93.23722), new google.maps.LatLng(44.99882,-93.23722), new google.maps.LatLng(44.99882,-93.24675)] 
-
+		//updates candidates when it's done
 		function updateRaces(){
-			//only re-do everything if they have not changed the race box
-				//if($('select#sRace').index()>0 && $('select#sRace').length != 0){
-				var selected = $('select#sYears').val();
-				$.getJSON("/getRaces/" + selected, function(data){
+			var selected = $('select#sYears').val();
+			
+			$.getJSON("/getRaces/" + selected, function(data){
 
-					//clean out the dropdown menu
-					$('select#sRaces').children().remove().end();
+				//clean out the dropdown menu
+				$('select#sRaces').children().remove().end();
 
 					
-					//populate dropdown menu from returned data
-					$.each(data.races, function(i, value){
+				//populate dropdown menu from returned data
+				//do the city-wide races first
+				$.each(data.races, function(i, value){
+					if(value.Location === 'Minneapolis'){
 						$('select#sRaces').append($('<option>').text(value.Name + ' ' + value.Location + ' ').attr('value', value.idRace));
-					});
-
-					//set the first one to selected
-					//$('select#sraces :nth-child(0)').prop('selected', true);
-
-					//update the candidate list
-					updateCandidates();
+					}
 				});
+
+		
+				//add add a divider bar to the last item in the all-city category
+				//$('select#sRaces option:first-child').css('padding-top', '10px');
+				//$('select#sRaces').append($('<option>').text('___________________________________').attr('disabled', 'disabled'));
+
+				//add an "all city council races option"
+				$('select#sRaces').append($('<option>').text("All City Council").attr('value', '0').css('font-weight', 'bold'));
+			
+				//add the city council races
+				$.each(data.races, function(i, value){
+					if(value.Location !== 'Minneapolis')
+						$('select#sRaces').append($('<option>').text(value.Name + ' ' + value.Location + ' ').attr('value', value.idRace));
+				});
+
+				//set the first one to selected
+				//$('select#sraces :nth-child(0)').prop('selected', true);
+
+				//update the candidate list
+				updateCandidates();
+
+			});
 		}
 
 
+		//calls draw wards when it's completed
 		function updateCandidates(){
 			var selected = $('select#sRaces').val();
 			$.getJSON("/getCandidates/" + selected, function(data){
 				$('select#sCandidates').children().remove().end();
+				//In the first spot, add an "All candidates"
+				$('select#sCandidates').append($('<option>').text("All").attr('value', '0'));				
+
 				//populate dropdown menu from retrieved data
 				$.each(data.candidates, function(i, value){
 					$('select#sCandidates').append($('<option>').text(value.First + ' ' + value.Last).attr('value', value.idCandidate));
 				});
+			
+				drawWards();
 			})
 		}
+
+
+		function updateResults(){
+			console.log('update results is called');
+			var selected = $('select#sRaces option:selected').val();
+
+			$.getJSON("/getResults_allWards/" + selected, function(data){
+				console.log(data.results);
+
+				//remove the candidates from the list
+				$('ul.list').empty();
+
+				//add the candidates to the results list
+				data.results[1].forEach(function(candidate){
+					$('ul.list').append('<li>'+candidate.First + ' ' + candidate.Last);
+
+				})
+
+				//my guess is this si doing something weird to all shapes
+				console.log('all shapes before update results paints the shapes: ');
+				console.log(allShapes);
+				//give color to the wards
+				allShapes.forEach(function(ward){
+					ward.setOptions({
+						fillColor:'green',
+						strokeColor: '#FF0000',
+						strokeOpacity: 0.8,
+						strokeWeight: 2,
+						fillColor: '#FF0000',
+						fillOpacity: 0.35
+					});
+				})
+
+				console.log('all shapes after updateResults paints the shapes: ');
+				console.log(allShapes);
+			})
+		}
+
 		function pinSymbol(color) {
 			return {
 				path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',

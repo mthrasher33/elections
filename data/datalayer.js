@@ -68,6 +68,16 @@
     };
 
 
+    this.getResults_allWards = function(idRace, callback) {
+        pool.getConnection(function(err,connection){
+            connection.query('Call spRaceResults_ByRace_ByWard(?);', idRace, function(err, rows, fields){
+                connection.release();
+                callback(err, rows, fields);
+            });
+        })
+    }
+
+
 
     // this.getPrecincts = function(callback) {
     //     pool.getConnection(function (err, connection) {

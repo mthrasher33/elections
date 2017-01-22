@@ -8,8 +8,8 @@ body {
 div#map {
 	height: 765px;
     width: 100%;
-    background-color: #d9d9d9;
-    position:relative;
+/*    background-color: #d9d9d9;
+*/    position:relative;
 }
 
     div#ward-legend {
@@ -113,8 +113,13 @@ input.year {
 
 }
 
-select#sRaces {
-    font-size:8px;
+select#sRaces:first-child {
+/*    font-size:8px;
+*/
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 10px;
 }
 
 input.dropdown-toggle::after {

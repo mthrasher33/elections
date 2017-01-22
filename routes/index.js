@@ -5,6 +5,8 @@ var GoogleMapsAPI = require('googlemaps');
 var datalayer = require('../data/datalayer.js');
 var moment = require('moment');
 var MarkerWithLabel = require('markerwithlabel');
+//var bootstrap_select = require('bootstrap-select');
+
 
 
 //var nodemailer = require('nodemailer');
@@ -135,13 +137,23 @@ router.get('/getPrecincts/:wardID', function (req, res) {
         }
 
     });
-
-
-
-   
-
-
 });
+
+
+//returns the ward results for the mayor's race and the
+//'all city council' button
+router.get('/getResults_allWards/:raceID', function(req,res) {
+    var raceID = req.params.raceID
+    datalayer.getResults_allWards(raceID, function(err,rows,fields){
+        if(!err){
+            res.send({results: rows});
+        } else {
+            console.log('Error while performing Query: ' + err);
+        }
+    })
+});
+
+
 /* GET about page. */
 router.get('/about', function (req, res) {
     // res.render('about', { title: 'About', path: req.path });
