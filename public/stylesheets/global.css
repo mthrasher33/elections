@@ -5,6 +5,73 @@ body {
     background-color: #FFFDF9;
 }
 
+li {
+    list-style: none;
+}
+
+ul.list {
+        max-height: 520px;
+    overflow: auto;
+}
+ul.list li {
+    border: 1px solid #d9d9d9;
+    margin-left: -40px;
+    margin-bottom: 20px;
+    margin-right: 15px;
+    box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+    cursor: pointer;
+    opacity: .8;
+}
+
+ul.list li:hover {
+    opacity: 1;
+    box-shadow: #B9E7FF 0px 1px 4px -1px;
+}
+
+div.candidate-color {
+        width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: black;
+    margin: 15px;
+    display: inline-flex;
+}
+
+div.party {
+    text-align: center;
+    border-top: 1px solid #d9d9d9;
+    border-bottom: 1px solid #d9d9d9;
+    color: blue;
+    padding:5px;
+}
+
+div.vote-totals {
+    padding-left: 10px;
+    padding-top:5px;
+    padding-bottom: 5px;
+    line-height:30px;
+}
+
+h3.name {
+    display: inline-flex;
+        padding-left: 10px;
+    margin-top: 12px;
+}
+
+span.formatted-votes {
+    float: right;
+    padding-right: 5px;
+    font-weight: bold;
+}
+
+div.learn-more {
+        text-align: center;
+    border-top: 1px solid #d9d9d9;
+    background-color: #d9d9d9;
+    color: black;
+    padding: 5px;
+}
+
 div#map {
 	height: 765px;
     width: 100%;
