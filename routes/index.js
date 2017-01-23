@@ -153,6 +153,31 @@ router.get('/getResults_allWards/:raceID', function(req,res) {
     })
 });
 
+//returns the results for one race in one ward (includes precinct break downs)
+router.get('/getResults_wardView/:wardID/:raceID', function(req,res){
+    var wardID = parseInt(req.params.wardID);
+    var raceID = parseInt(req.params.raceID);
+    datalayer.getResults_wardView(wardID, raceID, function(err,rows,fields){
+        if(!err){
+            res.send({ward_results: rows});
+        } else {
+            console.log('Error while performing Query: ' + err);
+        }
+    })
+})
+
+router.get('/getResults_precinctView/:precinctID/:raceID', function(req,res){
+    var precinctID = parseInt(req.params.precinctID);
+    var raceID = parseInt(req.params.raceID);
+    datalayer.getResults_precinctView(raceID, precinctID, function(err,rows,fields){
+        if(!err){
+            res.send({precinct_results: rows});
+        } else {
+            console.log('Error while performing Query: ' + err);
+        }
+    });
+})
+
 
 /* GET about page. */
 router.get('/about', function (req, res) {

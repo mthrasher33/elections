@@ -9,6 +9,11 @@ li {
     list-style: none;
 }
 
+span.pull-right {
+    position: absolute;
+    right: 32px;
+}
+
 ul.list {
         max-height: 520px;
     overflow: auto;
@@ -55,7 +60,7 @@ div.vote-totals {
 h3.name {
     display: inline-flex;
         padding-left: 10px;
-    margin-top: 12px;
+    margin-top: 10.5px;
 }
 
 span.formatted-votes {

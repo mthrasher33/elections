@@ -77,6 +77,24 @@
         })
     }
 
+    this.getResults_wardView = function(idRace, idWard, callback) {
+        pool.getConnection(function(err,connection){
+            connection.query('Call spWard_View(?, ?)', [idRace, idWard], function(err, rows, fields){
+                connection.release();
+                callback(err,rows,fields);
+            });
+        })
+    }
+
+    this.getResults_precinctView = function(idRace, idPrecinct, callback){
+        pool.getConnection(function(err,connection){
+            connection.query('Call spPrecinct_View(?,?)', [idRace, idPrecinct], function(err, rows, fields){
+                connection.release();
+                callback(err,rows,fields);
+            });
+        })
+    }
+
 
 
     // this.getPrecincts = function(callback) {
