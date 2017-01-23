@@ -48,7 +48,6 @@ block script
 		var minneapolis_lat = 44.98154;
 		var minneapolis_lng = -93.270718;
 
-		//$(document).ready(function() {
 			updateRaces();
 
 			var map;
@@ -153,18 +152,13 @@ block script
 			$('select#sYears').change(function(){
 				//only change everything if the map is zoomed out
 				if(map.center.lat() === minneapolis_lat && map.center.lng() === minneapolis_lng);
-					//drawWards();
 					updateRaces(); //this function calls updateCandidates();
-
-					//do this no matter if the map is zoomed in or not
-					//getResults();
-
 			});
 
 			$('select#sRaces').change(function(){
-				updateCandidates(true, false);
-
 				var selected = $('select#sRaces').val();
+
+				updateCandidates(true, false);
 
 				//if the race is a ward, zoom in on the ward.
 				//if the race is a city-wide race, don't do anything
@@ -198,10 +192,7 @@ block script
 
 			$('select#sCandidates').change(function(){
 				var selected = $('select#sCandidates option:selected').val();
-
 				var candidate_scroll = $('ul#candidate-list li h3.name:contains('+ selected +')');
-
-
 
 				$('ul#candidate-list li#' +selected).position().top();
 
@@ -218,6 +209,16 @@ block script
 
 				//remove the precincts
 				removePrecincts();
+
+				//set the map back to the mayor
+				$('select#sRaces option:contains(Mayor)').prop('selected', true);
+
+				//update the map accordingly
+				updateCandidates();
+
+				//reset the results label to 'City Wide'
+				$('span#location').text('City Wide');
+
 			});
 
 		//});
@@ -442,7 +443,8 @@ block script
 							    strokeWeight: 2,
 							    fillColor: '#FF0000',
 							    //fillColor: '#FF0000',
-							    fillOpacity: 0.35
+							    fillOpacity: 0.35,
+							    zIndex: 100
 							});
 
 							//add the following properties to precinctDesign
@@ -450,14 +452,12 @@ block script
 							precinctDesign['name'] = precinct.Precinct_Num; 
 							precinctDesign['id'] = precinct.idPrecinct;
 
-							console.log(precinctDesign);
 
 
 							//add click listener to precinct
 							google.maps.event.addListener(precinctDesign, 'click', function(event){
 								var precinctLevel = true;
 								//i'll need to get the results for the precinct 
-								//console.log(ward_results);
 								var precinctID = this.id;
 								var precinctName = this.name;
 								var raceID = $('select#sRaces option:selected').val();
@@ -465,10 +465,13 @@ block script
 									updateCandidateList(data.precinct_results, wardDesign.name + ' Precinct ' + precinctName, true);
 								});
 
+								//replace the 'back to city view' with a 'back to ward view'
+								$('')
+
 								//i'll need to re-center the map on the precinct
 								//set the new center at the end so that
-							//we can compare the new one to the old one
-							map.setCenter(this.center);
+								//we can compare the new one to the old one
+								map.setCenter(this.center);
 							});
 
 
@@ -490,10 +493,10 @@ block script
 							var raceID = $('select#sRaces option:selected').val();
 							//
 							$.getJSON("/getResults_wardView/" + wardID +"/" + raceID, function(data){
+								console.log("calling this one");
 								updateCandidateList(data.ward_results, wardDesign.name, false);
 							});
 						} else {
-							console.log("getting city council race data...");
 						}
 				};
 
@@ -583,7 +586,6 @@ block script
 		function updateCandidateList(candidates, location, precinctLevel){
 			$('ul.list').empty();
 			$('span#location').text(location);
-			console.log(candidates);
 			var candidatesLocal;
 			if(precinctLevel){
 				candidatesLocal = candidates[0];
@@ -591,11 +593,10 @@ block script
 				candidatesLocal = candidates[1];
 			}
 			candidatesLocal.forEach(function(candidate){
-					if(candidate.Sum_RC_First_Place_Votes){
+					if($('select#sYears option:selected').text().trim() === '2009' || $('select#sYears option:selected').text().trim() === '2013'){
 						//this is the box for people who ran with ranked choice voting
-						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.Sum_RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.Sum_RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.Sum_RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
+						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
 					} else {
-						console.log('trying to add FPTP people');
 						//this is the box for people who ran with FPTP voting
 						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">Votes: <span class="formatted-votes"> ' + candidate.FPTP_Votes_Sum  +'</span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
 
@@ -608,46 +609,24 @@ block script
 
 
 		function updateResults(wardLevel, precinctLevel){
-			//console.log('updateResults called');
 			var selected = $('select#sRaces option:selected').val();
 			var candidateColors = ['blue', 'yellow', 'orange', 'purple', 'teal'];
+			var location;
 
 			//only call this function if we are doing wardLevel
 			$.getJSON("/getResults_allWards/" + selected, function(data){
-				//console.log(data);
+				console.log(data);
 
-				//remove the candidates from the list
-				$('ul.list').empty();
+				//get location 
+				if(map.getCenter().lat() === 44.98154 && map.getCenter().lng() === -93.270718){
+					location = "City-Wide"
+				} 
 
-				//add the top eight candidates to the results list
-				//and assign them a color
-
-				//temp variable to run this even though i don't have mayoral results
-				//my guess is this nonsense will work itself out once I get mayoral results
-				var results
-				if(data.results[1].length > 0){
-					results = data.results[1];
-				} else {
-					results = data.results[0];
-				}
-				//console.log(data.results[0]);
-				results.forEach(function(candidate){
-					//console.log(candidate);
-					if(candidate.RC_First_Place_Votes){
-						//this is the box for people who ran with ranked choice voting
-						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
-					} else {
-						console.log('trying to add FPTP people');
-						//this is the box for people who ran with FPTP voting
-						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">Votes: <span class="formatted-votes"> ' + candidate.FPTP_Votes_Sum  +'</span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
+				//re-do the candidate list
+				updateCandidateList(data.results, location, precinctLevel)
 
 
-					//this is the box for people who ran with fptp voting
-
-					}
-				})
-
-				//give color to the wards
+				//paint the wards according to the winners
 				allShapes.forEach(function(ward){
 					ward.setOptions({
 						fillColor:'green',
