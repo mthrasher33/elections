@@ -196,17 +196,19 @@ block script
 			});
 
 			$('select#sCandidates').change(function(){
-				var selected = $('select#sCandidates option:selected').text();
+				var selected = $('select#sCandidates option:selected').val();
 
 				var candidate_scroll = $('ul#candidate-list li h3.name:contains('+ selected +')');
 
 
 				console.log(selected);
 
-				$('ul#candidate-list').animate({
-					scrollTop: $('ul#candidate-list li:contains(' + selected + ')').position().top
-					-260 }, 'slow');
-			})
+				$('ul#candidate-list li#' +selected).position().top();
+
+				//$('ul#candidate-list').animate({
+				//	scrollTop: $('ul#candidate-list li#' + selected ).position().top
+				//	}, 'slow');
+				})
 
 			$('span#back-to-city').click(function(){
 				map.panTo({lat: 44.98154, lng: -93.270718});
@@ -552,7 +554,7 @@ block script
 				data.results[1].forEach(function(candidate){
 					if(candidate.RC_First_Place_Votes){
 						//this is the box for people who ran with ranked choice voting
-						$('ul.list').append('<li><div class = "candidate-info"><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
+						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
 					} else {
 
 
