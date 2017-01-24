@@ -193,7 +193,7 @@ block script
 					getResults(true, polygon);
 
 				} else if (polygon.type === 'precinct'){
-					selectedPrecint = polygon;
+					selectedPrecinct = polygon;
 					map.setZoom(precinct_zoom);
 					//there is nothing you will have to do here, since all of this info will
 					//already be provided
@@ -236,11 +236,22 @@ block script
 			} else if(precinctZoom && !polygon) { //draw all the precincts in the city, no wards
 
 			}
+
+			//paint the wards according to the winners
+				allShapes.forEach(function(ward){
+					ward.setOptions({
+						fillColor:'green',
+						strokeColor: '#FF0000',
+						strokeOpacity: 0.8,
+						strokeWeight: 2,
+						fillColor: '#FF0000',
+						fillOpacity: 0.35
+					});
+				})
 		}
 
 		//this is already doing what you want. just need to improve it
-		function updateResults(wardLevel, precinctLevel){
-			console.log('called on start up');
+		/*function updateResults(wardLevel, precinctLevel){
 			var selected = $('select#sRaces option:selected').val();
 			var candidateColors = ['blue', 'yellow', 'orange', 'purple', 'teal'];
 			var location;
@@ -269,11 +280,13 @@ block script
 					});
 				})
 			})
-		}
+		}*/
 
 
 
 		function drawWards(){
+			removeWards();
+			removePrecincts();
 			var selected = $('select#sYears option:selected').val();
 		
 			$.getJSON("/getWards/" + selected, function(data){
@@ -376,8 +389,20 @@ block script
 						 */
 				} 
 			});
-					//the last thing we do is paint the results on the wards/precincts
-					updateResults();
+					//some advanced functionality would have it so that you could change the year
+					//and stay in the same place
+					//setting this to true will show precinct view for the whole city
+					//so let's do different things here if we are at different zooms
+					//will have to test this once i have different years in place
+					if (map.getZoom() === city_zoom){
+						moveMap(selectedWard, true);
+						//getResults(false);
+
+					} else if(map.getZoom() === ward_zoom){
+						getResults(true, selectedWard);
+					} else if(map.getZoom() === precinct_zoom){
+						getResults(true, selectedPrecinct);
+					}
 
 			});
 		}
@@ -539,6 +564,8 @@ block script
 					var selectedRace = $('select#sRaces option:selected').text();
 					var selectedWard;
 
+					console.log(selectedRace);
+
 					allShapes.forEach(function(ward){
 						if(selectedRace.indexOf(ward.name) >= 0){
 							selectedWard = ward;
@@ -556,12 +583,19 @@ block script
 		/****BIND EVENTS****/
 
 		$('select#sYears').change(function(){
+			//re-initiate everything
+			updateRaces();
+			//map.setZoom(city_zoom);
+			//map.setCe
+
 
 		});
 		
 		//when I change the race, I should update the candidates and move the map
 		$('select#sRaces').change(function(){
 			updateCandidates(false); //we are not initializing, so we do not need to redraw the wards
+
+
 
 
 		});
