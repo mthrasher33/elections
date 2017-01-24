@@ -47,7 +47,8 @@ block script
 		var regExp = /\(([^)]+)\)/;
 		var minneapolis_lat = 44.98154;
 		var minneapolis_lng = -93.270718;
-
+		var selectedWard;
+		var selectedPrecinct;
 
 		var map;
 		var city_zoom = 12;
@@ -168,30 +169,37 @@ block script
 
 			if(backToCity){
 				removePrecincts();
+				if(selectedWard){(selectedWard.label).setVisible(true)}; //set the label of the ward you're coming off of to visible
 				map.setZoom(city_zoom);
 				map.setCenter({lat: minneapolis_lat, lng: minneapolis_lng})
 
-				//call whatever you want here. want to go back to the mayor's race?
-				updateResults(raceID, precinctZoom)
+				//go back to the selected race, mayor's race or all city council with no precincts
+				getResults(false);
 			} else {
 
 				if(polygon.type === 'ward'){
 					removePrecincts();
 					map.setZoom(ward_zoom);
 					$('div#ward-legend').css('display', 'block');
+					if(selectedWard){(selectedWard.label).setVisible(true)}; //set the label of the ward you're coming off of to visible
 					selectedWard = polygon;
+					(polygon.label).setVisible(false); // make the label of the selected ward invisible
 
 					//need to call a function that is going to 
 					//update the results, color the polygons, and add them
 					//DUH! draw precincts should include shading them
 					//drawPrecincts(polygon[0]);
 
-					getResults(true, polyArray)
+					getResults(true, polygon);
+
 				} else if (polygon.type === 'precinct'){
 					selectedPrecint = polygon;
 					map.setZoom(precinct_zoom);
 					//there is nothing you will have to do here, since all of this info will
 					//already be provided
+
+					//show the results for just this precinct
+					getResults(true, polygon);
 				}
 
 				map.setCenter(polygon.center);
@@ -205,22 +213,65 @@ block script
 		//all json calls come out of here
 		function getResults(precinctZoom, polygon){
 			var raceID = $('select#sRaces option:selected').val();
-			var candidateID = $('select#sRaces option:selected').val();
-
+			var candidateID = $('select#sCandidates option:selected').val();
 			//all city council raceID = 0. 
-			if(precinctZoom && polygon.length < 2){ //draw all the precincts in one ward
-				//make the JSON call
-				//populate the candidate data
-				//paint the precincts in the ward (which will be shaded according to the data)
+			if(precinctZoom && polygon.type === 'ward'){ //draw all the precincts in one ward
+				
+				$.getJSON("/getResults_wardView/" + polygon.id +"/" + raceID, function(data){
+					updateCandidateList(data.ward_results, polygon.name, false);
+					drawPrecincts(polygon);
+				});
 
-				drawPrecincts(polygon[0]);
+			} else if(precinctZoom && polygon.type ==='precinct'){ //draw up the table just for the precinct in the ward
+				$.getJSON("/getResults_precinctView/" + polygon.id +"/" + raceID, function(data){
+					updateCandidateList(data.precinct_results, (polygon.parentPolygon).name + ' Precinct ' + polygon.name, true);
+				});
+			}
 
-			} else if(!precinctZoom && polygon.length > 1 ) { //draw all the wards in the city, no precincts
+			else if(!precinctZoom && !polygon ) { //draw all the wards in the city, no precincts
+				$.getJSON("/getResults_allWards/" + raceID, function(data){
+					updateCandidateList(data.results, "City-Wide", false)
+				});
 
-			} else if(precinctZoom && polygon.length > 1) { //draw all the precincts in the city, no wards
+			} else if(precinctZoom && !polygon) { //draw all the precincts in the city, no wards
 
 			}
 		}
+
+		//this is already doing what you want. just need to improve it
+		function updateResults(wardLevel, precinctLevel){
+			console.log('called on start up');
+			var selected = $('select#sRaces option:selected').val();
+			var candidateColors = ['blue', 'yellow', 'orange', 'purple', 'teal'];
+			var location;
+
+			//only call this function if we are doing wardLevel
+			$.getJSON("/getResults_allWards/" + selected, function(data){
+
+				//get location 
+				if(map.getCenter().lat() === 44.98154 && map.getCenter().lng() === -93.270718){
+					location = "City-Wide"
+				} 
+
+				//re-do the candidate list
+				updateCandidateList(data.results, location, precinctLevel)
+
+
+				//paint the wards according to the winners
+				allShapes.forEach(function(ward){
+					ward.setOptions({
+						fillColor:'green',
+						strokeColor: '#FF0000',
+						strokeOpacity: 0.8,
+						strokeWeight: 2,
+						fillColor: '#FF0000',
+						fillOpacity: 0.35
+					});
+				})
+			})
+		}
+
+
 
 		function drawWards(){
 			var selected = $('select#sYears option:selected').val();
@@ -237,23 +288,16 @@ block script
 						    center: getCenterPolygon(convertDBtoGM(ward)),
 						    name: ward.Ward_Name,
 						    id: ward.idWard,
-						    type: "ward"
+						    type: "ward",
+						    
 					});
 
 					google.maps.event.addListener(wardDesign, 'click', function(e){
-						//if the race is not they mayor's, set it to the ward race
-						/*var selectedRace = $('select#sRaces option:selected').text();
-						if(!selectedRace.indexOf("Minneapolis") >=0) {
-							var raceOptions = $('select#sRaces option');
-
-							raceOptions.each(function(race){
-								if((raceOptions[race].text()).indexOf(
-								wardDesign.name) >= 0 ){
-									race.prop('selected', true);	
-								}
-							})
-
-						}*/
+						//if we are zoomed in on another ward and the race is not they mayor's, set it to the ward race						
+						var selectedRace = $('select#sRaces option:selected').text();
+						if(!selectedRace.indexOf("Minneapolis") >=0 && map.getZoom()===ward_zoom) {
+							setRaceToWardRace($(this)[0]);
+						} 
 
 						moveMap($(this)[0]);
 					});
@@ -354,7 +398,8 @@ block script
 					    center: getCenterPolygon(convertDBtoGM(precinct)),
 					    name: precinct.Precinct_Num,
 					    id: precinct.idPrecinct,
-					    type: "precinct"
+					    type: "precinct",
+					    parentPolygon: wardDesign
 					});
 
 					google.maps.event.addListener(precinctDesign, 'click', function(e){
@@ -408,37 +453,7 @@ block script
 
 		/***SHOW DATA***/
 
-		//this is already doing what you want. just need to improve it
-		function updateResults(wardLevel, precinctLevel){
-			var selected = $('select#sRaces option:selected').val();
-			var candidateColors = ['blue', 'yellow', 'orange', 'purple', 'teal'];
-			var location;
-
-			//only call this function if we are doing wardLevel
-			$.getJSON("/getResults_allWards/" + selected, function(data){
-
-				//get location 
-				if(map.getCenter().lat() === 44.98154 && map.getCenter().lng() === -93.270718){
-					location = "City-Wide"
-				} 
-
-				//re-do the candidate list
-				updateCandidateList(data.results, location, precinctLevel)
-
-
-				//paint the wards according to the winners
-				allShapes.forEach(function(ward){
-					ward.setOptions({
-						fillColor:'green',
-						strokeColor: '#FF0000',
-						strokeOpacity: 0.8,
-						strokeWeight: 2,
-						fillColor: '#FF0000',
-						fillOpacity: 0.35
-					});
-				})
-			})
-		}
+		
 
 		function updateCandidateList(candidates, location, precinctLevel){
 			$('ul.list').empty();
@@ -528,7 +543,6 @@ block script
 						if(selectedRace.indexOf(ward.name) >= 0){
 							selectedWard = ward;
 							moveMap(ward);
-							//console.log(selectedWard);
 						}
 					})
 				}
@@ -559,6 +573,7 @@ block script
 
 		$('li#back').click(function(){
 			if(map.getZoom() === ward_zoom){
+				$('select#sRaces option:contains("Mayor Minneapolis")').prop('selected', true);
 				moveMap(selectedWard, true);
 
 			} else {
@@ -644,6 +659,11 @@ block script
 
 		/****UTILITY FUNCTIONS****/
 
+
+		function setRaceToWardRace(polygon){
+			$('select#sRaces option:contains(' + polygon.name + ' )').prop('selected', true);
+		}
+
 		function addLabel(polygon){
 			var marker = new google.maps.Marker({
 				position: polygon.center,
@@ -662,7 +682,11 @@ block script
 				moveMap($(this)[0].parentPolygon);
 			});
 
-			allMarkers.push(marker);	
+			allMarkers.push(marker);
+			
+			//link the marker to the parent polygon
+			(marker.parentPolygon)['label'] = marker;
+
 		}		
 
 		function removePrecincts(){

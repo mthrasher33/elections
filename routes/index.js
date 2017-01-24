@@ -148,7 +148,7 @@ router.get('/getResults_allWards/:raceID', function(req,res) {
         if(!err){
             res.send({results: rows});
         } else {
-            console.log('Error while performing Query: ' + err);
+            console.log('Error while performing getResults_allWards: ' + err);
         }
     })
 });
@@ -157,11 +157,12 @@ router.get('/getResults_allWards/:raceID', function(req,res) {
 router.get('/getResults_wardView/:wardID/:raceID', function(req,res){
     var wardID = parseInt(req.params.wardID);
     var raceID = parseInt(req.params.raceID);
+
     datalayer.getResults_wardView(wardID, raceID, function(err,rows,fields){
         if(!err){
             res.send({ward_results: rows});
         } else {
-            console.log('Error while performing Query: ' + err);
+            console.log('Error while performing getResults_WardView: ' + err);
         }
     })
 })
@@ -173,7 +174,7 @@ router.get('/getResults_precinctView/:precinctID/:raceID', function(req,res){
         if(!err){
             res.send({precinct_results: rows});
         } else {
-            console.log('Error while performing Query: ' + err);
+            console.log('Error while performing getResults_precinctView: ' + err);
         }
     });
 })
