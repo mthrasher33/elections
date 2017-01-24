@@ -172,9 +172,11 @@ block script
 				if(selectedWard){(selectedWard.label).setVisible(true)}; //set the label of the ward you're coming off of to visible
 				map.setZoom(city_zoom);
 				map.setCenter({lat: minneapolis_lat, lng: minneapolis_lng})
+					$('div#ward-legend').css('display', 'none');
 
 				//go back to the selected race, mayor's race or all city council with no precincts
 				getResults(false);
+				updateCandidates(false, true);
 			} else {
 
 				if(polygon.type === 'ward'){
@@ -212,10 +214,9 @@ block script
 			var candidateID = $('select#sCandidates option:selected').val();
 			//all city council raceID = 0. 
 			if(precinctZoom && polygon.type === 'ward'){ //draw all the precincts in one ward
-				//the candidate drop down is not changing here. 
-				//updateCandidates(); //now it's getting called and putting itself in an infinite loop
+
 				$.getJSON("/getResults_wardView/" + polygon.id +"/" + raceID, function(data){
-					updateCandidateList(data.ward_results, polygon.name, false);
+					updateCandidateList(data.ward_results, polygon.name, true);
 					drawPrecincts(polygon);
 				});
 
@@ -360,10 +361,10 @@ block script
 
 		function drawPrecincts(wardDesign){
 			removePrecincts();
-
 			console.log('drawing precincts');
+			var selectedRace = $('select#sRaces option:select').val()
 	
-			$.getJSON("/getPrecincts/" + wardDesign.id, function(data){
+			$.getJSON("/getPrecincts/" + wardDesign.id + "/" + selectedRace, function(data){
 				if(data){
 					(data.precincts).forEach(function(precinct){
 						precinctDesign = new google.maps.Polygon({
@@ -386,47 +387,17 @@ block script
 					});
 
 					allPrecincts.push(precinctDesign);
-					precinctDesign.setMap(map);
+					precinctDesign.setOptions({
+						fillColor: 'green'
 
-
-							/*//add click listener to precinct
-							google.maps.event.addListener(precinctDesign, 'click', function(event){
-								var precinctLevel = true;
-								//i'll need to get the results for the precinct 
-								var precinctID = this.id;
-								var precinctName = this.name;
-								var raceID = $('select#sRaces option:selected').val();
-								$.getJSON("/getResults_precinctView/" + precinctID +"/" + raceID, function(data){
-									updateCandidateList(data.precinct_results, wardDesign.name + ' Precinct ' + precinctName, true);
-								});
-
-								//replace the 'back to city view' with a 'back to ward view'
-								$('')
-
-								//i'll need to re-center the map on the precinct
-								//set the new center at the end so that
-								//we can compare the new one to the old one
-								map.setCenter(this.center);
-								map.setZoom(precinct_zoom);
-							});*/
 					});
 
-						//so if we get back precinct data,
-						//update the race results to show ward totals
-						//but we only need to do this if it's mayor races selected
-						/*var selected = $('select#sRaces option:selected').text();
 
-						if (selected.indexOf("Minneapolis") >= 0){
-							var wardID = wardDesign.id;
-							var raceID = $('select#sRaces option:selected').val();
-							//
-							$.getJSON("/getResults_wardView/" + wardID +"/" + raceID, function(data){
-								updateCandidateList(data.ward_results, wardDesign.name, false);
-							});
-						} else {
-						}*/
+					precinctDesign.setMap(map);
 
-					paintPrecincts();
+					});
+
+
 				};
 
 			});
@@ -437,6 +408,7 @@ block script
 		
 
 		function updateCandidateList(candidates, location, precinctLevel){
+			console.log(candidates);
 			$('ul.list').empty();
 			$('span#location').text(location);
 			var candidatesLocal;
@@ -446,18 +418,26 @@ block script
 				candidatesLocal = candidates[1];
 			}
 			candidatesLocal.forEach(function(candidate){
+
 					if($('select#sYears option:selected').text().trim() === '2009' || $('select#sYears option:selected').text().trim() === '2013'){
 						//this is the box for people who ran with ranked choice voting
-						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
+						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color" style="background-color: '+candidate.Color+'"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
 					} else {
 						//this is the box for people who ran with FPTP voting
 						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">Votes: <span class="formatted-votes"> ' + candidate.FPTP_Votes_Sum  +'</span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
-
-
-					//this is the box for people who ran with fptp voting
-
 					}				
 			});
+
+
+		}
+
+
+		function colorPrecincts(){
+			console.log('color precincts...')
+		}
+
+		function colorWards(){
+			console.log('coloring wards...')
 		}
 
 

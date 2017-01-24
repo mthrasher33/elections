@@ -127,7 +127,7 @@ router.get('/getWardLocation/:raceID', function(req, res){
 
 
 //returns the precicnts for the requested ward
-router.get('/getPrecincts/:wardID', function (req, res) {
+router.get('/getPrecincts/:wardID/:raceID', function (req, res) {
     var wardID = req.params.wardID
     datalayer.getPrecincts(wardID, function (err, rows, fields) {
         if(!err){
