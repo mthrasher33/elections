@@ -521,19 +521,33 @@ block script
 				} else { //since we're not drawing the wards, find the shape associated with the race and set the map to move to it
 					
 					var selectedRace = $('select#sRaces option:selected').text();
-					var selectedWard;
 
 					console.log(selectedRace);
 
 					//this probably will not work until i add more ward boundaries to the database
+					
 					allShapes.forEach(function(ward){
-						/*if(selectedRace.indexOf(ward.name) >= 0 && map.getZoom()!==precinct_zoom){ //don't move the map if you are on a precinct in the ward, just update the race
-							selectedWard = ward;
-							moveMap(ward);
-						} else if (selectedRace.indexOf(ward.name) && map.getZoom()===precinct_zoom){ //if we want to show the city council race in the precinct, moving to it from the mayoral race
-							getResults(true, selectedPrecinct);
-						}*/
+						if(selectedRace.indexOf(ward.name) >= 0){
+							if(map.getZoom() !== precinct_zoom){
+								selectedWard = ward;
+								moveMap(ward);
+								console.log("found a match");
+							}
+							else {
+								getResults(true, selectedPrecinct);
+							}
+						} 
 					})
+
+					if(selectedRace.indexOf('Minneapolis') > 0){
+						console.log('is this going again?');
+						getResults(true, selectedWard);
+					} else {
+						//getResults(false);
+					}
+
+	
+
 				}
 
 			})
