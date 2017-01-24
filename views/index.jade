@@ -184,11 +184,7 @@ block script
 					if(selectedWard){(selectedWard.label).setVisible(true)}; //set the label of the ward you're coming off of to visible
 					selectedWard = polygon;
 					(polygon.label).setVisible(false); // make the label of the selected ward invisible
-
-					//need to call a function that is going to 
-					//update the results, color the polygons, and add them
-					//DUH! draw precincts should include shading them
-					//drawPrecincts(polygon[0]);
+					updateCandidates(false, true)
 
 					getResults(true, polygon);
 
@@ -216,7 +212,8 @@ block script
 			var candidateID = $('select#sCandidates option:selected').val();
 			//all city council raceID = 0. 
 			if(precinctZoom && polygon.type === 'ward'){ //draw all the precincts in one ward
-				
+				//the candidate drop down is not changing here. 
+				//updateCandidates(); //now it's getting called and putting itself in an infinite loop
 				$.getJSON("/getResults_wardView/" + polygon.id +"/" + raceID, function(data){
 					updateCandidateList(data.ward_results, polygon.name, false);
 					drawPrecincts(polygon);
@@ -504,7 +501,7 @@ block script
 
 
 		//calls draw wards when it's completed
-		function updateCandidates(initialize, callback){
+		function updateCandidates(initialize, justJSON){
 			var selected = $('select#sRaces').val();
 			$.getJSON("/getCandidates/" + selected, function(data){
 				$('select#sCandidates').children().remove().end();
@@ -516,9 +513,9 @@ block script
 					$('select#sCandidates').append($('<option>').text(value.First + ' ' + value.Last).attr('value', value.idCandidate));
 				});
 				
-				if(initialize){
+				if(initialize && !justJSON){
 					drawWards();
-				} else { //since we're not drawing the wards, find the shape associated with the race and set the map to move to it
+				} else if(!justJSON) { //since we're not drawing the wards, find the shape associated with the race and set the map to move to it
 					
 					var selectedRace = $('select#sRaces option:selected').text();
 
@@ -545,14 +542,8 @@ block script
 					} else {
 						//getResults(false);
 					}
-
-	
-
 				}
-
-			})
-			
-			return true;
+			})			
 		}
 
 
