@@ -223,7 +223,6 @@ block script
 			} else if(precinctZoom && polygon.type ==='precinct'){ //draw up the table just for the precinct in the ward
 				$.getJSON("/getResults_precinctView/" + polygon.id +"/" + raceID, function(data){
 					updateCandidateList(data.precinct_results, (polygon.parentPolygon).name + ' Precinct ' + polygon.name, true);
-					//console.log("i should draw precincts now");
 					//drawPrecincts(polygon.parentPolygon);
 
 				});
@@ -345,7 +344,6 @@ block script
 						drawPrecincts(allShapes);
 
 					} else if(map.getZoom() === precinct_zoom){
-						console.log(allShapes);
 						drawPrecincts(allShapes);
 						//console.log(selectedPrecinct);
 						//getResults(true, selectedPrecinct);
@@ -361,13 +359,10 @@ block script
 
 		function drawPrecincts(wardDesign){
 			removePrecincts();
-			console.log('drawing precincts');
 			var selectedRace = $('select#sRaces option:selected').val()
 	
 			$.getJSON("/getPrecincts/" + wardDesign.id + "/" + selectedRace, function(data){
 				if(data){
-					console.log("here's what the server sent us to draw with: ");
-					console.log(data.precincts);
 					(data.precincts).forEach(function(precinct){
 						if(precinct[0]){
 
@@ -409,9 +404,7 @@ block script
 
 							}
 
-							console.log(precinctDesign);
-
-
+							addLabel(precinctDesign);	
 							precinctDesign.setMap(map);
 						}
 
@@ -666,6 +659,16 @@ block script
 		}
 
 		function addLabel(polygon){
+			var oldName;
+			//console.log(polygon);
+			console.log(polygon.parentPolygon);
+			//convert precinct names to strings
+			if(polygon.type === 'precinct'){
+				oldName = polygon['name'] = polygon.name.toString();
+				var wardNum = ((polygon.parentPolygon).name).replace( /^\D+/g, ''); 
+				polygon['name'] = "W " + wardNum + ": P" + polygon.name;
+			} 
+
 			var marker = new google.maps.Marker({
 				position: polygon.center,
 				map: map,
@@ -682,6 +685,10 @@ block script
 				marker, 'click', function(e){
 				moveMap($(this)[0].parentPolygon);
 			});
+
+			if(polygon.type==='precinct'){
+				polygon['name'] = oldName;
+			}
 
 			allMarkers.push(marker);
 			
