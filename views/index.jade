@@ -362,38 +362,58 @@ block script
 		function drawPrecincts(wardDesign){
 			removePrecincts();
 			console.log('drawing precincts');
-			var selectedRace = $('select#sRaces option:select').val()
+			var selectedRace = $('select#sRaces option:selected').val()
 	
 			$.getJSON("/getPrecincts/" + wardDesign.id + "/" + selectedRace, function(data){
 				if(data){
+					console.log("here's what the server sent us to draw with: ");
+					console.log(data.precincts);
 					(data.precincts).forEach(function(precinct){
-						precinctDesign = new google.maps.Polygon({
-					    paths: convertDBtoGM(precinct),
-					    strokeColor: '#FF0000',
-					    strokeOpacity: 0.8,
-					    strokeWeight: 2,
-					    fillColor: '#FF0000',
-					    fillOpacity: 0.35,
-					    zIndex: 100,
-					    center: getCenterPolygon(convertDBtoGM(precinct)),
-					    name: precinct.Precinct_Num,
-					    id: precinct.idPrecinct,
-					    type: "precinct",
-					    parentPolygon: wardDesign
-					});
+						if(precinct[0]){
 
-					google.maps.event.addListener(precinctDesign, 'click', function(e){
-						moveMap($(this)[0]);
-					});
+							//gotta turn off the color for the ward
+							wardDesign.setOptions({fillOpacity: 0});
 
-					allPrecincts.push(precinctDesign);
-					precinctDesign.setOptions({
-						fillColor: 'green'
+							precinctDesign = new google.maps.Polygon({
+							    paths: convertDBtoGM(precinct[0]),
+							    strokeColor: '#FF0000',
+							    strokeOpacity: 0.8,
+							    strokeWeight: 2,
+							    //fillColor: '#FF0000',
+							    //fillOpacity: 0.35,
+							    zIndex: 100,
+							    center: getCenterPolygon(convertDBtoGM(precinct[0])),
+							    name: precinct[0].Precinct_Num,
+							    id: precinct[0].idPrecinct,
+							    type: "precinct",
+							    parentPolygon: wardDesign
+							});
 
-					});
+							google.maps.event.addListener(precinctDesign, 'click', function(e){
+								moveMap($(this)[0]);
+							});
+
+							allPrecincts.push(precinctDesign);
+							
+							if(precinct[0].fptp_shade){
+								precinctDesign.setOptions({
+									fillColor: precinct[0].color,
+									fillOpacity: precinct[0].fptp_shade
+
+								});
+							} else {
+								precinctDesign.setOptions({
+									fillColor: precinct[0].color,
+									fillOpacity: precinct[0].rc_shade
+								})
+
+							}
+
+							console.log(precinctDesign);
 
 
-					precinctDesign.setMap(map);
+							precinctDesign.setMap(map);
+						}
 
 					});
 

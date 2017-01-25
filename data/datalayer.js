@@ -58,9 +58,10 @@
     }
 
 
-    this.getPrecincts = function(idWard, callback) {
+    this.getPrecincts = function(idRace, idWard, callback) {
         pool.getConnection(function(err,connection){
-            connection.query('Select * From Precincts where idWard = ?', idWard, function(err, rows, fields){
+            connection.query('Call spColorPrecincts(?, ?)', [idRace, idWard], function(err, rows, fields){
+            //connection.query('Select * From Precincts where idWard = ?', idWard, function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
             });
