@@ -54,6 +54,7 @@ block script
 		var city_zoom = 12;
 		var ward_zoom = 14;
 		var precinct_zoom = 15;
+		var overRidePaint;
 
 
 			updateRaces();
@@ -212,7 +213,9 @@ block script
 					//already be provided
 
 					//show the results for just this precinct
-					getResults(true, polygon);
+					//if(map.getZoom()!== precinct_zoom){//don't repaint results if you're just clicking between precincts
+						getResults(true, polygon);
+					//}
 				}
 
 				map.setCenter(polygon.center);
@@ -245,7 +248,11 @@ block script
 			} else if(precinctZoom && polygon.type ==='precinct'){ //draw up the table just for the precinct in the ward
 				$.getJSON("/getResults_precinctView/" + polygon.id +"/" + raceID, function(data){
 					updateCandidateList(data.precinct_results, (polygon.parentPolygon).name + ' Precinct ' + polygon.name, true);
-					//drawPrecincts(polygon.parentPolygon);
+					
+					if(overRidePaint || map.getZoom()!== precinct_zoom){//don't repaint results if you're just clicking between precincts
+						drawPrecincts(polygon.parentPolygon);
+						overRidePaint = false;
+					}
 
 				});
 			}
@@ -423,7 +430,7 @@ block script
 							precinctDesign = new google.maps.Polygon({
 							    paths: convertDBtoGM(precinct[0]),
 							    strokeColor: 'white',
-							    //strokeOpacity: precinct[0].fptp_shade,
+							    strokeOpacity: 1,
 							    strokeWeight: 3,
 							    //fillColor: '#FF0000',
 							    //fillOpacity: 0.35,
@@ -445,14 +452,14 @@ block script
 								precinctDesign.setOptions({
 									fillColor: precinct[0].color,
 									fillOpacity: precinct[0].fptp_shade,
-									strokeOpacity: precinct[0].fpfp_shade
+									//strokeOpacity: precinct[0].fpfp_shade
 
 								});
 							} else {
 								precinctDesign.setOptions({
 									fillColor: precinct[0].color,
 									fillOpacity: precinct[0].rc_shade,
-									strokeOpacity: precinct[0].rc_shade
+									//strokeOpacity: precinct[0].rc_shade
 								})
 
 							}
@@ -604,7 +611,7 @@ block script
 		//when I change the race, I should update the candidates and move the map
 		$('select#sRaces').change(function(){
 			updateCandidates(false); //we are not initializing, so we do not need to redraw the wards
-
+			overRidePaint = true;
 
 
 
@@ -722,7 +729,7 @@ block script
 			var marker = new google.maps.Marker({
 				position: polygon.center,
 				map: map,
-				label: {text: polygon.name, color: 'black', fontSize: "15px", fontFamily: "Roboto", fontWeight: "bold"},
+				label: {text: polygon.name, color: 'black', fontSize: "12px", fontFamily: "Roboto", fontWeight: "bold"},
 				labelInBackground: false,
 				labelClass: "marker-labels",
 				icon: pinSymbol('transluscent'),
