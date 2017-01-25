@@ -96,12 +96,12 @@ router.get('/getCandidates/:raceID', function(req, res){
 })
 
 //returns the shape of the wards that are drawn on the map
-router.get('/getWards/:electionID', function(req,res){
+router.get('/getWards/:raceID', function(req,res){
     //var electionDate = req.params.electionYear + "-12-31 23:59:59";
-    var electionID = req.params.electionID;    
+    var raceID = req.params.raceID;    
 
     //console.log(electionDate);
-    datalayer.getWards(electionID, function(err,rows,fields){
+    datalayer.getWards(raceID, function(err,rows,fields){
         if(!err) {
             res.send({wards: rows});
             //console.log(rows);

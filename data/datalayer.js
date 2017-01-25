@@ -31,7 +31,7 @@
 
     this.getCandidates = function(idRace, callback){
         pool.getConnection(function(err,connection){
-            connection.query('Select c.idCandidate, ctr.idCandidates_To_Race, c.First, c.Middle, c.Nickname, c.Last, c.Name_Suffix, ctr.FPTP_Votes_Total, ctr.RC_First_Place_Votes_Total, ctr.RC_Second_Place_Votes_Total, ctr.RC_Third_Place_Votes_Total from Candidates c Join Candidates_To_Race ctr ON ctr.idCandidate = c.idCandidate Where ctr.idRace = ? Order By ctr.FPTP_Votes_Total DESC, ctr.RC_First_Place_Votes_Total DESC, ctr.RC_Second_Place_Votes_Total DESC, ctr.RC_Third_Place_Votes_Total DESC;', idRace, function(err, rows, fields){
+            connection.query('Select ctr.Color, c.idCandidate, ctr.idCandidates_To_Race, c.First, c.Middle, c.Nickname, c.Last, c.Name_Suffix, ctr.FPTP_Votes_Total, ctr.RC_First_Place_Votes_Total, ctr.RC_Second_Place_Votes_Total, ctr.RC_Third_Place_Votes_Total from Candidates c Join Candidates_To_Race ctr ON ctr.idCandidate = c.idCandidate Where ctr.idRace = ? Order By ctr.FPTP_Votes_Total DESC, ctr.RC_First_Place_Votes_Total DESC, ctr.RC_Second_Place_Votes_Total DESC, ctr.RC_Third_Place_Votes_Total DESC;', idRace, function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
 
@@ -39,9 +39,9 @@
         })
     }
 
-    this.getWards = function(idElection, callback){
+    this.getWards = function(idRace,  callback){
          pool.getConnection(function(err,connection){
-            connection.query('Select w.idWard, w.Ward_Name, w.Year_Start, w.Year_End, w.Boundaries, w.Center, e.Date from Elections e Join Wards w on w.idCity = e.idCity Where idElection = ? And e.Date BETWEEN w.Year_Start AND w.Year_End;', idElection, function(err,rows,fields){ 
+            connection.query('Call spColorWards(?)', idRace, function(err,rows,fields){ 
                 connection.release();
                 callback(err,rows,fields);
             });

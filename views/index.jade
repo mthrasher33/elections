@@ -81,6 +81,13 @@ block script
 					        ]
 					    },
 					     {
+						    "featureType": "administrative.locality",
+						    "elementType": "labels",
+						    "stylers": [
+						      { "visibility": "off" }
+						    ]
+						},
+					     {
 						    "featureType": "administrative.neighborhood",
 						    "elementType": "labels",
 						    "stylers": [
@@ -177,9 +184,17 @@ block script
 				//go back to the selected race, mayor's race or all city council with no precincts
 				getResults(false);
 				updateCandidates(false, true);
+
+				//selectedWard.fillColor = selectedWard.fillColor;
+				console.log(selectedWard);
+
+				//selectedWard.fillOpacity = 0.5;
+				//selectedWard.setMap(map);
+
 			} else {
 
 				if(polygon.type === 'ward'){
+					if(selectedWard){selectedWard.setVisible(true)};
 					removePrecincts();
 					map.setZoom(ward_zoom);
 					$('div#ward-legend').css('display', 'block');
@@ -213,6 +228,13 @@ block script
 			var raceID = $('select#sRaces option:selected').val();
 			var candidateID = $('select#sCandidates option:selected').val();
 			//all city council raceID = 0. 
+
+			//if we are just showing wards, mark all wards as visible
+			if(!precinctZoom && selectedWard){
+				selectedWard.setVisible(true);
+			}
+
+
 			if(precinctZoom && polygon.type === 'ward'){ //draw all the precincts in one ward
 
 				$.getJSON("/getResults_wardView/" + polygon.id +"/" + raceID, function(data){
@@ -246,7 +268,7 @@ block script
 
 			}
 
-			//paint the wards according to the winners
+			/*//paint the wards according to the winners
 				allShapes.forEach(function(ward){
 					ward.setOptions({
 						fillColor:'green',
@@ -256,7 +278,7 @@ block script
 						fillColor: '#FF0000',
 						fillOpacity: 0.35
 					});
-				})
+				})*/
 		}
 
 		//this is already doing what you want. just need to improve it
@@ -296,23 +318,52 @@ block script
 		function drawWards(){
 			removeWards();
 			removePrecincts();
-			var selected = $('select#sYears option:selected').val();
+
+			var selected = $('select#sRaces option:selected').val();
 		
 			$.getJSON("/getWards/" + selected, function(data){
 				(data.wards).forEach(function(ward){
-					if(ward.Boundaries){
+					
+					if(ward[0] && ward[0].Boundaries){
+					
+
 								
 					// Styling & Controls
 					wardDesign = new google.maps.Polygon({
-						    paths: convertDBtoGM(ward),
+						    paths: convertDBtoGM(ward[0]),
 						    strokeWeight: 0,
-						    fillColor: '#FFFFFF',
-						    center: getCenterPolygon(convertDBtoGM(ward)),
-						    name: ward.Ward_Name,
-						    id: ward.idWard,
+						    //fillColor: ward[0].color,
+						    //fillOpacity: ward[0].rc_shade*10,
+						    strokeColor: 'black',
+						    //strokeOpacity: ward[0].rc_shade*10,
+						    strokeWeight: 3,
+						    
+
+						    //fillColor: '#FFFFFF',
+						    center: getCenterPolygon(convertDBtoGM(ward[0])),
+						    name: ward[0].Ward_Name,
+						    id: ward[0].idWard,
 						    type: "ward",
 						    
 					});
+
+					if(ward[0].fptp_shade){
+						wardDesign.setOptions({
+							fillColor: ward[0].color,
+							fillOpacity: ward[0].fptp_shade*10,
+							strokeOpacity: ward[0].fpfp_shade*10
+						});
+					} else {
+						wardDesign.setOptions({
+							fillColor: ward[0].color,
+							fillOpacity: ward[0].rc_shade*10,
+							strokeOpacity: ward[0].rc_shade*10
+						});
+					}
+
+					//old way of getting the center
+					//getCenterPolygon(convertDBtoGM(ward[0]))
+					//convertDBtoGM(ward[0].Center)
 
 					google.maps.event.addListener(wardDesign, 'click', function(e){
 						//if we are zoomed in on another ward and the race is not they mayor's, set it to the ward race						
@@ -345,7 +396,6 @@ block script
 
 					} else if(map.getZoom() === precinct_zoom){
 						drawPrecincts(allShapes);
-						//console.log(selectedPrecinct);
 						//getResults(true, selectedPrecinct);
 					}*/
 					getResults(false);
@@ -367,13 +417,14 @@ block script
 						if(precinct[0]){
 
 							//gotta turn off the color for the ward
-							wardDesign.setOptions({fillOpacity: 0});
+							//wardDesign.setOptions({fillOpacity: 0});
+							wardDesign.setVisible(false);
 
 							precinctDesign = new google.maps.Polygon({
 							    paths: convertDBtoGM(precinct[0]),
-							    strokeColor: '#FF0000',
-							    strokeOpacity: 0.8,
-							    strokeWeight: 2,
+							    strokeColor: 'white',
+							    //strokeOpacity: precinct[0].fptp_shade,
+							    strokeWeight: 3,
 							    //fillColor: '#FF0000',
 							    //fillOpacity: 0.35,
 							    zIndex: 100,
@@ -393,13 +444,15 @@ block script
 							if(precinct[0].fptp_shade){
 								precinctDesign.setOptions({
 									fillColor: precinct[0].color,
-									fillOpacity: precinct[0].fptp_shade
+									fillOpacity: precinct[0].fptp_shade,
+									strokeOpacity: precinct[0].fpfp_shade
 
 								});
 							} else {
 								precinctDesign.setOptions({
 									fillColor: precinct[0].color,
-									fillOpacity: precinct[0].rc_shade
+									fillOpacity: precinct[0].rc_shade,
+									strokeOpacity: precinct[0].rc_shade
 								})
 
 							}
@@ -421,7 +474,7 @@ block script
 		
 
 		function updateCandidateList(candidates, location, precinctLevel){
-			console.log(candidates);
+			//console.log(candidates);
 			$('ul.list').empty();
 			$('span#location').text(location);
 			var candidatesLocal;
@@ -446,11 +499,9 @@ block script
 
 
 		function colorPrecincts(){
-			console.log('color precincts...')
 		}
 
 		function colorWards(){
-			console.log('coloring wards...')
 		}
 
 
@@ -497,6 +548,8 @@ block script
 		function updateCandidates(initialize, justJSON){
 			var selected = $('select#sRaces').val();
 			$.getJSON("/getCandidates/" + selected, function(data){
+				console.log(data);
+
 				$('select#sCandidates').children().remove().end();
 				//In the first spot, add an "All candidates"
 				$('select#sCandidates').append($('<option>').text("All").attr('value', '0'));				
@@ -512,7 +565,6 @@ block script
 					
 					var selectedRace = $('select#sRaces option:selected').text();
 
-					console.log(selectedRace);
 
 					//this probably will not work until i add more ward boundaries to the database
 					
@@ -521,7 +573,6 @@ block script
 							if(map.getZoom() !== precinct_zoom){
 								selectedWard = ward;
 								moveMap(ward);
-								console.log("found a match");
 							}
 							else {
 								getResults(true, selectedPrecinct);
@@ -530,7 +581,6 @@ block script
 					})
 
 					if(selectedRace.indexOf('Minneapolis') > 0){
-						console.log('is this going again?');
 						getResults(true, selectedWard);
 					} else {
 						//getResults(false);
@@ -660,8 +710,6 @@ block script
 
 		function addLabel(polygon){
 			var oldName;
-			//console.log(polygon);
-			console.log(polygon.parentPolygon);
 			//convert precinct names to strings
 			if(polygon.type === 'precinct'){
 				oldName = polygon['name'] = polygon.name.toString();
@@ -669,17 +717,24 @@ block script
 				polygon['name'] = "W " + wardNum + ": P" + polygon.name;
 			} 
 
+			//console.log("Lat: " + polygon.center.lat() + " Lng: " + polygon.center.lng());
+
 			var marker = new google.maps.Marker({
 				position: polygon.center,
 				map: map,
-				label: {text: polygon.name, color:"red", fontSize: "15px", fontFamily: "Roboto", fontWeight: "bold"},
+				label: {text: polygon.name, color: 'black', fontSize: "15px", fontFamily: "Roboto", fontWeight: "bold"},
 				labelInBackground: false,
 				labelClass: "marker-labels",
 				icon: pinSymbol('transluscent'),
-				anchor: polygon.center,
-				center: polygon.center,
+				//anchor: polygon.center,
+				//center: polygon.center,
 				parentPolygon: polygon
 			});
+
+			//hard coded positional overrides if labels are off
+			if(polygon.id === 29){
+				marker.position = (new google.maps.LatLng(44.985771, -93.259355));
+			}
 
 			google.maps.event.addListener(
 				marker, 'click', function(e){
@@ -700,11 +755,12 @@ block script
 		function removePrecincts(){
 			for (var i=0; i<allPrecincts.length; i++){
 				allPrecincts[i].setMap(null);
-				//allMarkers[i].setMap(null);
+				allMarkers[i].setMap(null);
 			}
 
 			//empty the allShapes array
 			allPrecincts = [];
+			allMarkers = [];
 		}
 
 		//first clear all the shapes on the map
