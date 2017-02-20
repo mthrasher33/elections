@@ -8,5 +8,21 @@
 	"start": "node ./bin/www"
   },
   "author": "Matthew Thrasher",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "*",
+    "bootstrap": "*",
+    "cookie-parser": "*",
+    "debug": "*",
+    "express": "*",
+    "googlemaps": "*",
+    "jade": "*",
+    "markerwithlabel": "*",
+    "moment": "*",
+    "morgan": "*",
+    "mysql": "*",
+    "serve-favicon": "*",
+    "stylus": "*"
+
+  }
 }
