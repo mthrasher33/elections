@@ -9,22 +9,30 @@ block content
 			div.col-xs-9
 				div#map
 				div#ward-legend
-					ul
-						li
-							a(href='http://www.nba.com') Homepage
-						li
-							a(href='#') Ward History
-						li
-							a(href='#') Contact
-						li#back
-							span#back Back
+
+
+					
 			div.col-xs-3
 				div#form
-					div.form-group
-						label(for='sYears') Year
-						select.form-control#sYears
-							for year, i in years
-								option.dropdown-item(value="#{years[i].idElection}") #{years[i].Year}					
+					div.row
+						div.col-xs-6
+							div.form-group
+								label(for='sYears') Year
+								select.form-control#sYears
+									for year, i in years
+										option.dropdown-item(value="#{years[i].idElection}") #{years[i].Year}
+						div.col-xs-6
+							div.toggleViews
+								div.form-group
+									div.radio
+										label(for='rbWardView').radio-inline
+											input(type='radio' name='mapView' value='1' checked="checked")#rbWardView
+											| Wards
+								div.form-group
+									div.radio
+										label(for='rbPrecinctView').radio-inline
+											input(type='radio' name='mapView' value='1')#rbPrecinctView
+											| Precincts					
 					div.form-group
 						label(for='sYears') Race
 						select.form-control#sRaces
@@ -57,11 +65,14 @@ block script
 		var overRidePaint;
 
 
+
+
+
+
+
 			updateRaces();
 
 			function initMap(){
-
-
 				wardDesign = new google.maps.Polygon({
 					//paths: wardCoords,
 					strokeWeight: 0,
@@ -180,7 +191,7 @@ block script
 				if(selectedWard){(selectedWard.label).setVisible(true)}; //set the label of the ward you're coming off of to visible
 				map.setZoom(city_zoom);
 				map.setCenter({lat: minneapolis_lat, lng: minneapolis_lng})
-					$('div#ward-legend').css('display', 'none');
+				//$('div#ward-legend').css('display', 'none');
 
 				//go back to the selected race, mayor's race or all city council with no precincts
 				getResults(false);
@@ -197,18 +208,18 @@ block script
 				if(polygon.type === 'ward'){
 					if(selectedWard){selectedWard.setVisible(true)};
 					removePrecincts();
-					map.setZoom(ward_zoom);
-					$('div#ward-legend').css('display', 'block');
-					if(selectedWard){(selectedWard.label).setVisible(true)}; //set the label of the ward you're coming off of to visible
+					//map.setZoom(ward_zoom);
+					//$('div#ward-legend').css('display', 'block');
+					//if(selectedWard){(selectedWard.label).setVisible(true)}; //set the label of the ward you're coming off of to visible
 					selectedWard = polygon;
-					(polygon.label).setVisible(false); // make the label of the selected ward invisible
+					//(polygon.label).setVisible(false); // make the label of the selected ward invisible
 					updateCandidates(false, true)
 
 					getResults(true, polygon);
 
 				} else if (polygon.type === 'precinct'){
 					selectedPrecinct = polygon;
-					map.setZoom(precinct_zoom);
+					//map.setZoom(precinct_zoom);
 					//there is nothing you will have to do here, since all of this info will
 					//already be provided
 
@@ -218,7 +229,7 @@ block script
 					//}
 				}
 
-				map.setCenter(polygon.center);
+				//map.setCenter(polygon.center);
 
 			}
 
@@ -239,18 +250,29 @@ block script
 
 
 			if(precinctZoom && polygon.type === 'ward'){ //draw all the precincts in one ward
+				//if we are viewing the mayoral race
+				if($('select#sRaces option:selected').text().indexOf('Mayor') > -1){
+					$.getJSON("/getResults_wardView/" + polygon.id +"/" + raceID, function(data){
+						updateCandidateList(data.ward_results, polygon.name, true);
+						drawPrecincts(polygon);
+					});
+				} else { //set the race to the ward city council race and then get the data
+					var race = $('select#sRaces option:contains(' + polygon.name + ' )');
+					race.prop('selected', true);
+					console.log(race);
+					raceID = $('select#sRaces option:selected').val();
+					$.getJSON("/getResults_wardView/" + polygon.id +"/" + raceID, function(data){
+						updateCandidateList(data.ward_results, polygon.name, true);
+						drawPrecincts(polygon);
+					});
 
-				$.getJSON("/getResults_wardView/" + polygon.id +"/" + raceID, function(data){
-					updateCandidateList(data.ward_results, polygon.name, true);
-					drawPrecincts(polygon);
-				});
-
+				}
 			} else if(precinctZoom && polygon.type ==='precinct'){ //draw up the table just for the precinct in the ward
 				$.getJSON("/getResults_precinctView/" + polygon.id +"/" + raceID, function(data){
 					updateCandidateList(data.precinct_results, (polygon.parentPolygon).name + ' Precinct ' + polygon.name, true);
 					
 					if(overRidePaint || map.getZoom()!== precinct_zoom){//don't repaint results if you're just clicking between precincts
-						drawPrecincts(polygon.parentPolygon);
+						//drawPrecincts(polygon.parentPolygon);
 						overRidePaint = false;
 					}
 
@@ -339,19 +361,12 @@ block script
 					wardDesign = new google.maps.Polygon({
 						    paths: convertDBtoGM(ward[0]),
 						    strokeWeight: 0,
-						    //fillColor: ward[0].color,
-						    //fillOpacity: ward[0].rc_shade*10,
 						    strokeColor: 'black',
-						    //strokeOpacity: ward[0].rc_shade*10,
 						    strokeWeight: 3,
-						    
-
-						    //fillColor: '#FFFFFF',
 						    center: getCenterPolygon(convertDBtoGM(ward[0])),
 						    name: ward[0].Ward_Name,
 						    id: ward[0].idWard,
-						    type: "ward",
-						    
+						    type: "ward",				    
 					});
 
 					if(ward[0].fptp_shade){
@@ -374,48 +389,38 @@ block script
 
 					google.maps.event.addListener(wardDesign, 'click', function(e){
 						//if we are zoomed in on another ward and the race is not they mayor's, set it to the ward race						
-						var selectedRace = $('select#sRaces option:selected').text();
+						/*var selectedRace = $('select#sRaces option:selected').text();
 						if(!selectedRace.indexOf("Minneapolis") >=0 && map.getZoom()===ward_zoom) {
 							setRaceToWardRace($(this)[0]);
-						} 
+						}*/ 
 
 						moveMap($(this)[0]);
 					});
 
-					addLabel(wardDesign);
 					allShapes.push(wardDesign);
 					wardDesign.setMap(map);
-				} 
+				}
+
+				drawPrecincts(wardDesign);
+ 
 			});
-					//some advanced functionality would have it so that you could change the year
-					//and stay in the same place
-					//setting this to true will show precinct view for the whole city
-					//so let's do different things here if we are at different zooms
-					//will have to test this once i have different years in place
-				/*	if (map.getZoom() === city_zoom){
-						moveMap(selectedWard, true);
-						//getResults(false);
 
-					} else if(map.getZoom() === ward_zoom){
-						//getResults(true, selectedWard);
-
-						drawPrecincts(allShapes);
-
-					} else if(map.getZoom() === precinct_zoom){
-						drawPrecincts(allShapes);
-						//getResults(true, selectedPrecinct);
-					}*/
-					getResults(false);
+			getResults(false, false);
 
 			});
-		}
-
-		function paintPrecincts(){
-
 		}
 
 		function drawPrecincts(wardDesign){
-			removePrecincts();
+		console.log('drawing precincts...');
+			//removePrecincts();
+
+			//set the selectedWard to visible again
+			//selectedWard.setVisible(true);
+			allShapes.forEach(function(shape){
+				//if($('select#sRaces option:selected).text().shape.name)
+				//shape.setOptions({fillOpacity: 0});
+				//shape.setVisible(true);
+			});
 			var selectedRace = $('select#sRaces option:selected').val()
 	
 			$.getJSON("/getPrecincts/" + wardDesign.id + "/" + selectedRace, function(data){
@@ -424,14 +429,15 @@ block script
 						if(precinct[0]){
 
 							//gotta turn off the color for the ward
-							//wardDesign.setOptions({fillOpacity: 0});
-							wardDesign.setVisible(false);
+							wardDesign.setOptions({fillOpacity: 0});
+
+							//wardDesign.setVisible(false);
 
 							precinctDesign = new google.maps.Polygon({
 							    paths: convertDBtoGM(precinct[0]),
 							    strokeColor: 'white',
 							    strokeOpacity: 1,
-							    strokeWeight: 3,
+							    strokeWeight: 4,
 							    //fillColor: '#FF0000',
 							    //fillOpacity: 0.35,
 							    zIndex: 100,
@@ -463,8 +469,7 @@ block script
 								})
 
 							}
-
-							addLabel(precinctDesign);	
+							//addLabel(precinctDesign);	
 							precinctDesign.setMap(map);
 						}
 
@@ -545,7 +550,7 @@ block script
 				//$('select#sraces :nth-child(0)').prop('selected', true);
 
 				//update the candidate list
-				updateCandidates(true); //whenever we update the races (i.e. change the year), we want to fully re-draw the wards
+				updateCandidates(true, false); //whenever we update the races (i.e. change the year), we want to fully re-draw the wards
 
 			});
 		}
@@ -555,7 +560,6 @@ block script
 		function updateCandidates(initialize, justJSON){
 			var selected = $('select#sRaces').val();
 			$.getJSON("/getCandidates/" + selected, function(data){
-				console.log(data);
 
 				$('select#sCandidates').children().remove().end();
 				//In the first spot, add an "All candidates"
@@ -579,6 +583,7 @@ block script
 						if(selectedRace.indexOf(ward.name) >= 0){
 							if(map.getZoom() !== precinct_zoom){
 								selectedWard = ward;
+								//moveMap(null, true);
 								moveMap(ward);
 							}
 							else {
@@ -600,19 +605,20 @@ block script
 		/****BIND EVENTS****/
 
 		$('select#sYears').change(function(){
-			//re-initiate everything
 			updateRaces();
-			//map.setZoom(city_zoom);
-			//map.setCe
-
-
 		});
 		
 		//when I change the race, I should update the candidates and move the map
 		$('select#sRaces').change(function(){
-			updateCandidates(false); //we are not initializing, so we do not need to redraw the wards
-			overRidePaint = true;
+			
 
+			updateCandidates(false); //we are not initializing, so we do not need to redraw the wards
+
+			console.log(allShapes);
+			//allShapes.forEach(function(ward){
+			//	if((ward.name).indexOf('select#sRaces')
+			//});
+			//set the ward race you chose to the selected ward
 
 
 		});
@@ -622,94 +628,7 @@ block script
 
 		});
 
-		$('li#back').click(function(){
-			if(map.getZoom() === ward_zoom){
-				$('select#sRaces option:contains("Mayor Minneapolis")').prop('selected', true);
-				moveMap(selectedWard, true);
-
-			} else {
-				moveMap(selectedWard);
-			}
-		});
-
-
-		/*	//bind events
-			$('select#sYears').change(function(){
-				//only change everything if the map is zoomed out
-				if(map.center.lat() === minneapolis_lat && map.center.lng() === minneapolis_lng);
-					updateRaces(); //this function calls updateCandidates();
-			});
-
-			$('select#sRaces').change(function(){
-				var selected = $('select#sRaces').val();
-
-				updateCandidates(true, false);
-
-				//if the race is a ward, zoom in on the ward.
-				//if the race is a city-wide race, don't do anything
-				$.getJSON("/getWardLocation/" + selected, function(data){
-					if(data.ward[0]){
-						//Go find the center of the ward and set the map to the ward's center
-						if(data.ward[0].Center){
-							data.ward = (data.ward[0].Center).split(/[()]+/).filter(function(e) { return e; });
-							data.ward = getLatLngFromString(data.ward[1]);
-
-							map.setZoom(ward_zoom);
-
-							//only draw the precincts if the map moves
-							//prevents precincts from flickering on drop down select
-							if(map.getCenter() !== data.ward){
-								removePrecincts();
-								allShapes.forEach(function(shape){
-									if(google.maps.geometry.poly.containsLocation(data.ward, shape)){
-										drawPrecincts(shape);
-									}  
-								});
-							}
-						}
-						//also make the ward menu visible and recenter the map
-						$('div#ward-legend').css('display', 'block');
-						map.panTo(data.ward);
-					}
-
-				});
-			});
-
-			$('select#sCandidates').change(function(){
-				var selected = $('select#sCandidates option:selected').val();
-				var candidate_scroll = $('ul#candidate-list li h3.name:contains('+ selected +')');
-
-				$('ul#candidate-list li#' +selected).position().top();
-
-				//$('ul#candidate-list').animate({
-				//	scrollTop: $('ul#candidate-list li#' + selected ).position().top
-				//	}, 'slow');
-				})
-
-			$('span#back-to-city').click(function(){
-				map.panTo({lat: 44.98154, lng: -93.270718});
-				//map.setCenter({lat: 44.98154, lng: -93.270718});
-				map.setZoom(city_zoom);
-				$('div#ward-legend').css('display', 'none');
-
-				//remove the precincts
-				removePrecincts();
-
-				//set the map back to the mayor
-				$('select#sRaces option:contains(Mayor)').prop('selected', true);
-
-				//update the map accordingly
-				updateCandidates();
-
-				//reset the results label to 'City Wide'
-				$('span#location').text('City Wide');
-
-			});
-
-		*/	
-
 		/****UTILITY FUNCTIONS****/
-
 
 		function setRaceToWardRace(polygon){
 			$('select#sRaces option:contains(' + polygon.name + ' )').prop('selected', true);
@@ -729,7 +648,8 @@ block script
 			var marker = new google.maps.Marker({
 				position: polygon.center,
 				map: map,
-				label: {text: polygon.name, color: 'black', fontSize: "12px", fontFamily: "Roboto", fontWeight: "bold"},
+				label: {text: polygon.name, color: 'black', fontSize: "0px", fontFamily: "Roboto", fontWeight: "bold"},
+				//label: {text: polygon.name, color: 'black', fontSize: "12px", fontFamily: "Roboto", fontWeight: "bold"},
 				labelInBackground: false,
 				labelClass: "marker-labels",
 				icon: pinSymbol('transluscent'),
@@ -743,10 +663,10 @@ block script
 				marker.position = (new google.maps.LatLng(44.985771, -93.259355));
 			}
 
-			google.maps.event.addListener(
+			/*google.maps.event.addListener(
 				marker, 'click', function(e){
 				moveMap($(this)[0].parentPolygon);
-			});
+			});*/
 
 			if(polygon.type==='precinct'){
 				polygon['name'] = oldName;
@@ -762,7 +682,7 @@ block script
 		function removePrecincts(){
 			for (var i=0; i<allPrecincts.length; i++){
 				allPrecincts[i].setMap(null);
-				allMarkers[i].setMap(null);
+				//allMarkers[i].setMap(null);
 			}
 
 			//empty the allShapes array
@@ -774,7 +694,7 @@ block script
 		function removeWards(){
 			for (var i=0; i<allShapes.length; i++){
 				allShapes[i].setMap(null);
-				allMarkers[i].setMap(null);
+				//allMarkers[i].setMap(null);
 			}
 
 			allShapes = [];
