@@ -215,3 +215,7 @@ input.dropdown-toggle::after {
     border-right: .3em solid transparent;
     border-left: .3em solid transparent;
 }
+
+#backToCity {
+    cursor: pointer;
+}
