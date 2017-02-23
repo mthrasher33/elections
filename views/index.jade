@@ -208,6 +208,7 @@ block script
 				});
 
 				//set the selectedWard color back to the mayor's race color
+				//so this is the code doing the weird stuff with ward 13
 					if(selectedWard){
 						selectedWard.setVisible(true); //make it visible again!
 						if(selectedWard.fptp_shade){
@@ -276,6 +277,13 @@ block script
 
 		$('select#sCandidates').change(function(){
 
+		});
+
+		$('select#sYears').change(function(){
+			$('input[name="mapView"][value="wardView"]').prop('checked',true);
+			//$('#rbWardview').prop('checked',true);
+			$('select#sRaces').prop("disabled", false);			
+			populateRaces(true);
 		});
 
 		function paintPrecincts(getNewBoundaries, candidateHeatMap, wardDesign){
@@ -438,12 +446,16 @@ block script
 		$('input[type=radio][name=mapView]').change(function() {
 			var checkedValue = $('input[name=mapView]:checked').val()
 			if (checkedValue === 'wardView'){
+			$('select#sRaces').prop("disabled", false);
 
 				paintMap(true);
 			} else { //painting precincts
 
 			removePrecincts();
 			populateRaces(true);
+
+			//let's just disable the option to choose the ward races
+			$('select#sRaces').prop("disabled", true);
 				//paintMap(true);
 			}
 		
