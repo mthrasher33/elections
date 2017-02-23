@@ -257,7 +257,8 @@ block script
 		
 				$.getJSON("/getResults_allWards/" + raceID, function(data){
 					//populateRaceTable(data.results, "City-Wide", false)
-					paintMap(true);
+					//paintMap(true);
+					populateCandidates(true);
 				});
 		});
 
