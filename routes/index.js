@@ -44,9 +44,6 @@ router.get('/', function (req, res) {
     
     datalayer.getElectionYears(function(err,rows,fields){
         if(!err){
-
-
-
             res.render('index', {title: 'Test', years: rows});
             console.log(rows);
 

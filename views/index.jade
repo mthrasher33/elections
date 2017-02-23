@@ -160,26 +160,28 @@ block script
 								    id: ward[0].idWard,
 								    type: "ward",
 								    //zIndex: 200,
-								    fptp_shade: ward[0].fptp_shade,
-								    rc_shade: ward[0].rc_shade,
+								    fptp_shade: heatMap(ward[0].fptp_shade),
+								    rc_shade: heatMap(ward[0].rc_shade),
 								    mayorColor: ward[0].color,
-								    strokeOpacityFPTP: ward[0].fptp_shade*10,
-								    strokeOpacityRC: ward[0].rc_shade*10				    
+								    strokeOpacityFPTP: heatMap(ward[0].fptp_shade),
+								    strokeOpacityRC: heatMap(ward[0].rc_shade)				    
 							});
 
 							if(ward[0].fptp_shade){
 								wardDesign.setOptions({
 									fillColor: ward[0].color,
-									fillOpacity: ward[0].fptp_shade*10,
-									strokeOpacity: ward[0].fptp_shade*10
+									fillOpacity: heatMap(ward[0].fptp_shade),
+									strokeOpacity: heatMap(ward[0].fptp_shade)
 								});
 							} else {
 								wardDesign.setOptions({
 									fillColor: ward[0].color,
-									fillOpacity: ward[0].rc_shade*10,
-									strokeOpacity: ward[0].rc_shade*10
+									fillOpacity: heatMap(ward[0].rc_shade),
+									strokeOpacity: heatMap(ward[0].rc_shade)
 								});
 							}
+
+							console.log(wardDesign.name + " " + wardDesign.fillOpacity);
 
 							google.maps.event.addListener(wardDesign, 'click', function(e){
 								var clickedWard = this;
@@ -216,14 +218,14 @@ block script
 						if(selectedWard.fptp_shade){
 							selectedWard.setOptions({
 								fillColor: selectedWard.mayorColor,
-								fillOpacity: selectedWard.fptp_shade,
-								strokeOpacity: selectedWard.strokeOpacityFPTP
+								fillOpacity: heatMap(selectedWard.fptp_shade),
+								strokeOpacity: heatMap(selectedWard.strokeOpacityFPTP)
 							});
 						} else {
 								wardDesign.setOptions({
 									fillColor: selectedWard.mayorColor,
-									fillOpacity: selectedWard.rc_shade,
-									strokeOpacity: selectedWard.strokeOpacityRC
+									fillOpacity: heatMap(selectedWard.rc_shade),
+									strokeOpacity: heatMap(selectedWard.strokeOpacityRC)
 								});
 								console.log('changing fillOpacity');
 						}
@@ -279,6 +281,22 @@ block script
 			}
 		});
 
+		function heatMap(number){
+			var newNumber;
+			if(number < .4){
+				newNumber = number-.1;
+			} else {
+				newNumber = number+.1;
+			}
+
+
+			//heatMap can't return values over 1
+			if(newNumber > 1){
+				newNumber = 1;
+			}
+			return newNumber;
+		}
+
 
 		$('select#sCandidates').change(function(){
 
@@ -332,25 +350,27 @@ block script
 									});
 								});
 
-								console.log("Parent name: " + (precinctDesign.parentPolygon).name + " Precincnt num: " + precinctDesign.name);
+			
 
 								allPrecincts.push(precinctDesign);
 								
 								if(precinct[0].fptp_shade){
 									precinctDesign.setOptions({
 										fillColor: precinct[0].color,
-										fillOpacity: precinct[0].fptp_shade,
-										//strokeOpacity: precinct[0].fpfp_shade
+										fillOpacity:heatMap(precinct[0].fptp_shade),
+										//strokeOpacity: heatMap(precinct[0].fpfp_shade)
 
 									});
 								} else {
 									precinctDesign.setOptions({
 										fillColor: precinct[0].color,
-										fillOpacity: precinct[0].rc_shade,
-										//strokeOpacity: precinct[0].rc_shade
+										fillOpacity: heatMap(precinct[0].rc_shade),
+										//strokeOpacity: heatMap(precinct[0].rc_shade)
 									})
 
 								}
+								
+								console.log("Parent name: " + (precinctDesign.parentPolygon).name + " Precincnt num: " + precinctDesign.name + " Opacity: " + precinctDesign.fillOpacity);
 								precinctDesign.setMap(map);
 								allPrecincts.push(precinctDesign);
 							}
