@@ -345,6 +345,15 @@ block script
 					};
 
 				});
+
+			//populate the ward-view of the the full city
+			if (selectedRace.indexOf('Minneapolis') > 0){
+				//then we paint everything that is in all wards
+				//every time you get all the wards, you sould re-set the candidate table
+				$.getJSON("/getResults_allWards/" + raceID, function(data){
+					populateRaceTable(data.results, "City-Wide", false)
+				});
+			}
 			}
 
 		}
