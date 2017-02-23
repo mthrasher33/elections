@@ -116,8 +116,10 @@ block script
 				paintWards(getNewBoundaries, candidateHeatMap);
 			} else {//paint all the precincts
 				if(selectedRaceIndex === 0){//if it's the mayor's race, paint all the precincts
+					console.log(allWards);
 					allWards.forEach(function(ward){
 						paintPrecincts(getNewBoundaries, candidateHeatMap, ward)
+						console.log(ward.name);
 					})
 				} else {
 					//just paint the precinct for the one
@@ -219,13 +221,16 @@ block script
 							});
 						} else {
 								wardDesign.setOptions({
-								fillColor: selectedWard.mayorColor,
-								fillOpacity: selectedWard.rc_shade,
-								strokeOpacity: selectedWard.strokeOpacityRC
+									fillColor: selectedWard.mayorColor,
+									fillOpacity: selectedWard.rc_shade,
+									strokeOpacity: selectedWard.strokeOpacityRC
 								});
+								console.log('changing fillOpacity');
 						}
 					console.log(selectedWard);
 					}
+
+				//allWards[12].setOptions({fillOpacity: allWards[12].rc_shade});
 
 				//set the correspondingward to the new selected ward	
 				selectedWard = correspondingWard;
@@ -257,7 +262,7 @@ block script
 				var raceID = $('select#sRaces option:selected').val();
 		
 				$.getJSON("/getResults_allWards/" + raceID, function(data){
-					//populateRaceTable(data.results, "City-Wide", false)
+					populateRaceTable(data.results, "City-Wide", false)
 					//paintMap(true);
 					populateCandidates(true);
 				});
@@ -323,8 +328,11 @@ block script
 
 									$.getJSON("/getResults_precinctView/" + this.id +"/" + raceID, function(data){
 										populateRaceTable(data.precinct_results, (clickedPrecinct.parentPolygon).name + ' Precinct ' + clickedPrecinct.name, true);
+										console.log((clickedPrecinct.parentPolygon).name);
 									});
 								});
+
+								console.log("Parent name: " + (precinctDesign.parentPolygon).name + " Precincnt num: " + precinctDesign.name);
 
 								allPrecincts.push(precinctDesign);
 								
