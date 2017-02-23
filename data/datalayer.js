@@ -48,6 +48,15 @@
         });       
     }
 
+    this.getWardsHeatMap = function(idRace, idCandidate, callback){
+        pool.getConnection(function(err,connection){
+            connection.query('Call spColorWards_HeatMap(?, ?)', [idRace, idCandidate], function(err, rows, fields){
+                connection.release();
+                callback(err,rows,fields);
+            });
+        });        
+    }
+
     this.getWardLocation = function(idRace, callback){
         pool.getConnection(function(err,connection){
             connection.query('Select w.Center from Races r Join Locations l on l.idLocations = r.idLocation Join Wards w on w.idWard = l.idWard where r.idRace = ?;', idRace, function(err,rows,fields){

@@ -92,7 +92,7 @@ router.get('/getCandidates/:raceID', function(req, res){
     })
 })
 
-//returns the shape of the wards that are drawn on the map
+//returns the shape of the wards that are drawn on the map with colors for the winner
 router.get('/getWards/:raceID', function(req,res){
     //var electionDate = req.params.electionYear + "-12-31 23:59:59";
     var raceID = req.params.raceID;    
@@ -102,6 +102,22 @@ router.get('/getWards/:raceID', function(req,res){
         if(!err) {
             res.send({wards: rows});
             //console.log(rows);
+        } else {
+            console.log('Error while performing Query: ' + err);
+        }
+    });
+});
+
+//returns the shape of the wards that are drawn on the map with a candidate's heat map
+router.get('/getWards_candidateHeatMap/:raceID/:candidateID', function(req,res){
+    //var electionDate = req.params.electionYear + "-12-31 23:59:59";
+    var raceID = req.params.raceID;
+    var candidateID = req.params.candidateID;    
+
+    //console.log(electionDate);
+    datalayer.getWardsHeatMap(raceID, candidateID, function(err,rows,fields){
+        if(!err) {
+            res.send({wards: rows});
         } else {
             console.log('Error while performing Query: ' + err);
         }

@@ -50,7 +50,7 @@ block content
 block script
 	script(type='text/javascript').
 
-		var minneapolis_lat = 44.98154;
+		var minneapolis_lat = 44.9723;
 		var minneapolis_lng = -93.270718;
 		var city_zoom = 12;
 
@@ -100,7 +100,7 @@ block script
 
 				//populate dropdown menu from retrieved data
 				$.each(data.candidates, function(i, value){
-					$('select#sCandidates').append($('<option>').text(value.First + ' ' + value.Last).attr('value', value.idCandidate));
+					$('select#sCandidates').append($('<option>').text(value.First + ' ' + value.Last).attr('value', value.idCandidates_To_Race));
 				});
 
 				paintMap(newYear);
@@ -110,10 +110,15 @@ block script
 		//paint the map, update the race table
 		function paintMap(getNewBoundaries){
 			var wardView = $('#rbWardView').is(':checked');
-			var candidateHeatMap = $('#sCandidates').val();
+			var candidateHeatMap = ($('#sCandidates').val() > 0);
 			var selectedRaceIndex = $("select#sRaces").prop('selectedIndex')
 			if(wardView){//paint the wards
+				
+				if(!candidateHeatMap){
 				paintWards(getNewBoundaries, candidateHeatMap);
+				} else {
+				paintWards(getNewBoundaries, candidateHeatMap)
+				}
 			} else {//paint all the precincts
 				if(selectedRaceIndex === 0){//if it's the mayor's race, paint all the precincts
 					console.log(allWards);
@@ -144,63 +149,123 @@ block script
 			//if we need new boundaries, delete everything in our all wards and add the new wards
 			if(totalRepaint){
 				var selected = $('select#sRaces option:selected').val();
+				var candidate = $('select#sCandidates option:selected').val();
 				removeWards();
 				removePrecincts();
-				$.getJSON("/getWards/" + selected, function(data){
-					(data.wards).forEach(function(ward){
-						if(ward[0] && ward[0].Boundaries){						
-							// Styling & Controls
-							wardDesign = new google.maps.Polygon({
-								    paths: convertDBtoGM(ward[0]),
-								    strokeWeight: 0,
-								    strokeColor: 'black',
-								    strokeWeight: 3,
-								    center: getCenterPolygon(convertDBtoGM(ward[0])),
-								    name: ward[0].Ward_Name,
-								    id: ward[0].idWard,
-								    type: "ward",
-								    //zIndex: 200,
-								    fptp_shade: heatMap(ward[0].fptp_shade),
-								    rc_shade: heatMap(ward[0].rc_shade),
-								    mayorColor: ward[0].color,
-								    strokeOpacityFPTP: heatMap(ward[0].fptp_shade),
-								    strokeOpacityRC: heatMap(ward[0].rc_shade)				    
-							});
+				if(!candidateHeatMap){
+					$.getJSON("/getWards/" + selected, function(data){
+						(data.wards).forEach(function(ward){
+							if(ward[0] && ward[0].Boundaries){						
+								// Styling & Controls
+								wardDesign = new google.maps.Polygon({
+									    paths: convertDBtoGM(ward[0]),
+									    strokeWeight: 0,
+									    strokeColor: 'black',
+									    strokeWeight: 3,
+									    center: getCenterPolygon(convertDBtoGM(ward[0])),
+									    name: ward[0].Ward_Name,
+									    id: ward[0].idWard,
+									    type: "ward",
+									    //zIndex: 200,
+									    fptp_shade: heatMap(ward[0].fptp_shade),
+									    rc_shade: heatMap(ward[0].rc_shade),
+									    mayorColor: ward[0].color,
+									    strokeOpacityFPTP: heatMap(ward[0].fptp_shade),
+									    strokeOpacityRC: heatMap(ward[0].rc_shade)				    
+								});
 
-							if(ward[0].fptp_shade){
-								wardDesign.setOptions({
-									fillColor: ward[0].color,
-									fillOpacity: heatMap(ward[0].fptp_shade),
-									strokeOpacity: heatMap(ward[0].fptp_shade)
-								});
-							} else {
-								wardDesign.setOptions({
-									fillColor: ward[0].color,
-									fillOpacity: heatMap(ward[0].rc_shade),
-									strokeOpacity: heatMap(ward[0].rc_shade)
-								});
+								if(ward[0].fptp_shade){
+									wardDesign.setOptions({
+										fillColor: ward[0].color,
+										fillOpacity: heatMap(ward[0].fptp_shade),
+										strokeOpacity: heatMap(ward[0].fptp_shade)
+									});
+								} else {
+									wardDesign.setOptions({
+										fillColor: ward[0].color,
+										fillOpacity: heatMap(ward[0].rc_shade),
+										strokeOpacity: heatMap(ward[0].rc_shade)
+									});
+								}
+
+								console.log(wardDesign.name + " " + wardDesign.fillOpacity);
+
+								google.maps.event.addListener(wardDesign, 'click', function(e){
+									var clickedWard = this;
+									$.getJSON("/getResults_wardView/" + this.id +"/" + raceID, function(data){
+										populateRaceTable(data.ward_results, clickedWard.name, true);
+									});
+								});	
+								
+							allWards.push(wardDesign);
+							wardDesign.setMap(map);
 							}
+						});	
+					});
+					//then we paint everything that is in all wards
+					//every time you get all the wards, you sould re-set the candidate table
+					$.getJSON("/getResults_allWards/" + raceID, function(data){
+						populateRaceTable(data.results, "City-Wide", false)
+					});
 
-							console.log(wardDesign.name + " " + wardDesign.fillOpacity);
 
-							google.maps.event.addListener(wardDesign, 'click', function(e){
-								var clickedWard = this;
-								$.getJSON("/getResults_wardView/" + this.id +"/" + raceID, function(data){
-									populateRaceTable(data.ward_results, clickedWard.name, true);
+
+				} else { //we are doing a full repaint, but we are doing one with a candidate heat map
+					$.getJSON("/getWards_candidateHeatMap/" + selected + "/" + candidate, function(data){
+						(data.wards).forEach(function(ward){
+							if(ward[0] && ward[0].Boundaries){	
+								// Styling & Controls
+								wardDesign = new google.maps.Polygon({
+									    paths: convertDBtoGM(ward[0]),
+									    strokeWeight: 0,
+									    strokeColor: 'black',
+									    strokeWeight: 3,
+									    center: getCenterPolygon(convertDBtoGM(ward[0])),
+									    name: ward[0].Ward_Name,
+									    id: ward[0].idWard,
+									    type: "ward",
+									    //zIndex: 200,
+									    fptp_shade: ward[0].fptp_shade,
+									    rc_shade: ward[0].rc_shade,
+									    mayorColor: ward[0].color,
+									    strokeOpacityFPTP: heatMap(ward[0].fptp_shade, true),
+									    strokeOpacityRC: heatMap(ward[0].rc_shade, true)				    
 								});
-							});	
-							
-						allWards.push(wardDesign);
-						wardDesign.setMap(map);
-					}
-					});	
-				});
 
-				//then we paint everything that is in all wards
-				//every time you get all the wards, you sould re-set the candidate table
-				$.getJSON("/getResults_allWards/" + raceID, function(data){
-					populateRaceTable(data.results, "City-Wide", false)
-				});
+								if(ward[0].fptp_shade){
+									wardDesign.setOptions({
+										fillColor: ward[0].color,
+										fillOpacity: heatMap(ward[0].fptp_shade, true),
+										strokeOpacity: heatMap(ward[0].fptp_shade, true)
+									});
+								} else {
+									wardDesign.setOptions({
+										fillColor: ward[0].color,
+										fillOpacity: heatMap(ward[0].rc_shade, true),
+										strokeOpacity: heatMap(ward[0].rc_shade, true)
+									});
+								}
+
+								//console.log(wardDesign.name + " " + wardDesign.fillOpacity);
+
+								google.maps.event.addListener(wardDesign, 'click', function(e){
+									var clickedWard = this;
+									$.getJSON("/getResults_wardView/" + this.id +"/" + raceID, function(data){
+										populateRaceTable(data.ward_results, clickedWard.name, true);
+									});
+								});	
+								
+							allWards.push(wardDesign);
+							wardDesign.setMap(map);
+							}
+						});	
+
+
+
+					});
+				}
+
+
 
 			} else {//we are not doing a full repaint and are just painting individual wards
 				var raceSelected = $('#sRaces option:selected').text();
@@ -273,7 +338,8 @@ block script
 		//when I change the race, I should update the candidates and move the map
 		$('select#sRaces').change(function(){
 			if($('select#sRaces').prop('selectedIndex')===0){
-				paintMap(true)
+				populateCandidates(true);
+				//paintMap(true)
 			} else{
 
 			//paintMap(true);
@@ -281,24 +347,52 @@ block script
 			}
 		});
 
-		function heatMap(number){
-			var newNumber;
-			if(number < .4){
-				newNumber = number-.1;
-			} else {
-				newNumber = number+.1;
-			}
+		function heatMap(number, isCandidateMap){
+			if(!isCandidateMap){
+				var newNumber;
+				if(number < .4){
+					newNumber = number-.1;
+				} else {
+					newNumber = number+.1;
+				}
 
 
-			//heatMap can't return values over 1
-			if(newNumber > 1){
-				newNumber = 1;
-			}
+				} else {
+					if(number > .15){
+						newNumber = number*3;
+					} else {
+						newNumber = number*2;
+					}
+
+				}
+
+
+
+			//just some corrections in case something bad happened
+
+				//heatMap can't return values over 1
+				if(newNumber > 1){
+					newNumber = 1;
+				} if (newNumber < 0){
+					newNumber = .05;
+				}
 			return newNumber;
 		}
 
 
 		$('select#sCandidates').change(function(){
+			paintMap(true)
+
+
+
+			//I want to highlight the candidate
+			var selectedCandidate = $('select#sCandidates').val();
+			console.log(selectedCandidate);
+			$('ul#candidate-list')
+			/*$('html, body').animate({
+				scrollTop: $("#' + selectedCandidate + '").offset().top
+			}, 2000);*/
+
 
 		});
 
@@ -370,7 +464,7 @@ block script
 
 								}
 								
-								console.log("Parent name: " + (precinctDesign.parentPolygon).name + " Precincnt num: " + precinctDesign.name + " Opacity: " + precinctDesign.fillOpacity);
+								//console.log("Parent name: " + (precinctDesign.parentPolygon).name + " Precincnt num: " + precinctDesign.name + " Opacity: " + precinctDesign.fillOpacity);
 								precinctDesign.setMap(map);
 								allPrecincts.push(precinctDesign);
 							}
@@ -411,10 +505,10 @@ block script
 
 					if($('select#sYears option:selected').text().trim() === '2009' || $('select#sYears option:selected').text().trim() === '2013'){
 						//this is the box for people who ran with ranked choice voting
-						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color" style="background-color: '+candidate.Color+'"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
+						$('ul.list').append('<li id=' + candidate.idCandidates_To_Race+ '><div class = "candidate-info" id='+  candidate.idCandidates_To_Race+'><div class="row"><div class="col-xs-2"><div class = "candidate-color" style="background-color: '+candidate.Color+'"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
 					} else {
 						//this is the box for people who ran with FPTP voting
-						$('ul.list').append('<li id=' + candidate.idCandidate+ '><div class = "candidate-info" id='+  candidate.idCandidate+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">Votes: <span class="formatted-votes"> ' + candidate.FPTP_Votes_Sum  +'</span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
+						$('ul.list').append('<li id=' + candidate.idCandidates_To_Race+ '><div class = "candidate-info" id='+  candidate.idCandidates_To_Race+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">Votes: <span class="formatted-votes"> ' + candidate.FPTP_Votes_Sum  +'</span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
 					}				
 			});
 		}

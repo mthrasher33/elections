@@ -107,6 +107,7 @@ div#map {
         font-family: "Roboto";
         box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
         font-size: 11px;
+        display:none;
     }
 
         div#ward-legend ul {
