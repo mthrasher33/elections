@@ -381,16 +381,7 @@ block script
 
 		var divOffset = 0;
 
-		$('select#sCandidates').change(function(){
-			//only do this if we're on the mayor's race
-			if($('select#sRaces').prop('selectedIndex')===0){
-				paintMap(true)
-			} else {//if we're on the ward races, we have to paint a heat map of a precinct
-				paintPrecincts(true, true, selectedWard);
-			}
-
-
-
+		function moveCandidateList(){
 			//I want to highlight the candidate
 			//I think this is my only choice because of the way the data is being written
 			var selectedCandidate = $('select#sCandidates').val();
@@ -407,8 +398,8 @@ block script
 			//this moves correctly from the top position
 			console.log("Div offset before function: " + divOffset)
 
+			//code to move list to candidates
 			var indexOfCandidate = $('ul#candidate-list li').index($('#' + selectedCandidate));
-
 			var sum = 0;
 
 			$('li:lt(' +  (indexOfCandidate)  + ')').each(function() {
@@ -451,6 +442,21 @@ block script
 			//this changes based on the person selected
 			console.log("divOffset at end of function:" + divOffset);
 
+		}
+
+		$('select#sCandidates').change(function(){
+			//only do this if we're on the mayor's race
+			if($('select#sRaces').prop('selectedIndex')===0){
+				paintMap(true)
+			} else {//if we're on the ward races, we have to paint a heat map of a precinct
+				paintPrecincts(true, true, selectedWard);
+			}
+
+			moveCandidateList();
+
+
+
+			
 		});
 
 		$('select#sYears').change(function(){
@@ -645,6 +651,10 @@ block script
 						$('ul.list').append('<li id=' + candidate.idCandidates_To_Race+ '><div class = "candidate-info" id='+  candidate.idCandidates_To_Race+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">Votes: <span class="formatted-votes"> ' + candidate.FPTP_Votes_Sum  +'</span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
 					}				
 			});
+
+			if($('select#sCandidates').prop('selectedIndex') > 0){ //after you create a new list, move it if we're on a candidate heat map
+				moveCandidateList();
+			}
 		}
 
 		function removePrecincts(){
