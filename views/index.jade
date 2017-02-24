@@ -244,8 +244,6 @@ block script
 									});
 								}
 
-								//console.log(wardDesign.name + " " + wardDesign.fillOpacity);
-
 								google.maps.event.addListener(wardDesign, 'click', function(e){
 									var clickedWard = this;
 									$.getJSON("/getResults_wardView/" + this.id +"/" + raceID, function(data){
@@ -257,15 +255,13 @@ block script
 							wardDesign.setMap(map);
 							}
 						});	
-
-
-
 					});
 				}
 
 
 
 			} else {//we are not doing a full repaint and are just painting individual wards
+				console.log('are we trying to repaint the selected ward?');
 				var raceSelected = $('#sRaces option:selected').text();
 				var correspondingWard;
 				allWards.forEach(function(ward){
@@ -274,6 +270,8 @@ block script
 					}
 				});
 
+				console.log(selectedWard);
+
 				//set the selectedWard color back to the mayor's race color
 				//so this is the code doing the weird stuff with ward 13
 					if(selectedWard){
@@ -281,7 +279,7 @@ block script
 						if(selectedWard.fptp_shade){
 							selectedWard.setOptions({
 								fillColor: selectedWard.mayorColor,
-								fillOpacity: heatMap(selectedWard.fptp_shade),
+								fillOpacity: heatMap(selectedWard.fptp_shade, false),
 								strokeOpacity: heatMap(selectedWard.strokeOpacityFPTP)
 							});
 						} else {
@@ -292,8 +290,6 @@ block script
 								});
 						}
 					}
-
-				//allWards[12].setOptions({fillOpacity: allWards[12].rc_shade});
 
 				//set the correspondingward to the new selected ward	
 				selectedWard = correspondingWard;
@@ -344,11 +340,12 @@ block script
 		});
 
 		function heatMap(number, isCandidateMap){
-			
+
+			var newNumber;			
 			var checkedValue = $('input[name=mapView]:checked').val()
-			console.log(checkedValue);			
+			
 			if(!isCandidateMap){
-				var newNumber;
+				//console.log('heat map goes to is not a candidate map');
 				if(number < .4){
 					newNumber = number-.1;
 				} else {
@@ -356,24 +353,18 @@ block script
 				}
 
 
-				} else {//paint a heat map
-					console.log('heatMap trying to make a candidateMap');
-					if(checkedValue === 'wardView'){
-						console.log('it thinks wardview is checked');
-						//for the ward view
-						if(number > .15){
-							newNumber = number*3;
-						} else {
-							newNumber = number*2;
-						}
-					} else {//the precinct view for the mayor's race
-						console.log('precinct view for mayors race');
-						newNumber = number*18;
-
+			} else {//paint a heat map
+				if(checkedValue === 'wardView'){//heat maps for the ward level mayor and also for the city council precinct views
+					//for the ward view
+					if(number > .15){
+						newNumber = number*3;
+					} else {
+						newNumber = number*2;
 					}
-
+				} else {//the precinct view for the mayor's race
+						newNumber = number*18;
 				}
-
+			}
 
 
 			//just some corrections in case something bad happened
@@ -382,7 +373,8 @@ block script
 				if(newNumber > 1){
 					newNumber = 1;
 				} if (newNumber < 0){
-					newNumber = .05;
+					//oh boy, this is happening here
+					//newNumber = .05;
 				}
 			return newNumber;
 		}
