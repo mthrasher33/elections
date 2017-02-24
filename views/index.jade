@@ -104,6 +104,7 @@ block script
 				});
 
 				paintMap(newYear);
+				moveCandidateList();
 			})
 		}
 
@@ -190,9 +191,12 @@ block script
 
 								google.maps.event.addListener(wardDesign, 'click', function(e){
 									var clickedWard = this;
-									$.getJSON("/getResults_wardView/" + this.id +"/" + raceID, function(data){
-										populateRaceTable(data.ward_results, clickedWard.name, true);
-									});
+									//only change the table if we are not on a city council race
+									if($('select#sRaces').prop('selectedIndex') === 0){
+										$.getJSON("/getResults_wardView/" + this.id +"/" + raceID, function(data){
+											populateRaceTable(data.ward_results, clickedWard.name, true);
+										});
+									}
 								});	
 								
 							allWards.push(wardDesign);
@@ -246,9 +250,11 @@ block script
 
 								google.maps.event.addListener(wardDesign, 'click', function(e){
 									var clickedWard = this;
-									$.getJSON("/getResults_wardView/" + this.id +"/" + raceID, function(data){
-										populateRaceTable(data.ward_results, clickedWard.name, true);
-									});
+									if($('select#sRaces').prop('selectedIndex') === 0){
+										$.getJSON("/getResults_wardView/" + this.id +"/" + raceID, function(data){
+											populateRaceTable(data.ward_results, clickedWard.name, true);
+										});
+									}
 								});	
 								
 							allWards.push(wardDesign);
