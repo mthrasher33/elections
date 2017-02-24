@@ -379,6 +379,7 @@ block script
 			return newNumber;
 		}
 
+		var divOffset = 0;
 
 		$('select#sCandidates').change(function(){
 			//only do this if we're on the mayor's race
@@ -391,13 +392,64 @@ block script
 
 
 			//I want to highlight the candidate
+			//I think this is my only choice because of the way the data is being written
 			var selectedCandidate = $('select#sCandidates').val();
 			console.log(selectedCandidate);
 			$('ul#candidate-list')
-			/*$('html, body').animate({
-				scrollTop: $("#' + selectedCandidate + '").offset().top
-			}, 2000);*/
+			
 
+			//582 for mark andrew
+			//818 for don samuels
+			//1054 for Cam inwton
+
+			//OK, they seem to be 236 apart.
+
+			//this moves correctly from the top position
+			console.log("Div offset before function: " + divOffset)
+
+			var indexOfCandidate = $('ul#candidate-list li').index($('#' + selectedCandidate));
+
+			var sum = 0;
+
+			$('li:lt(' +  (indexOfCandidate)  + ')').each(function() {
+				sum += $(this).height() + 23;
+			});
+
+			console.log("height of all previous divs: " + sum);
+			console.log("indexOfcandidate: " + indexOfCandidate);
+
+			var heightOfDiv = $('li#' + selectedCandidate).height()
+			$('ul#candidate-list').animate({
+					scrollTop: sum
+				}, 2000);
+
+			/*if(divOffset === 0){
+				$('ul#candidate-list').animate({
+					scrollTop: $('#' + selectedCandidate).position().top
+				}, 2000);
+			} else { //orchestrate the move with the slider already changed
+				$('ul#candidate-list').animate({
+					scrollTop: divOffset - $('#' + selectedCandidate).position().top
+				}, 2000);
+			}*/
+
+			//just do the index times 236!
+			//index of selected candidate
+			//console.log("Index: " + $('ul#candidate-list li').index($('#' + selectedCandidate)));
+			//variable indexOfCandidate = $('ul#candidate-list li').index($('#' + selectedCandidate))
+			//console.log("Height of element: " + $('#' + selectedCandidate).height());
+
+			//divOffset = $('#' + selectedCandidate).offset().top;
+
+
+
+
+
+			//this never changes
+			//console.log($('ul#candidate-list').offset());
+
+			//this changes based on the person selected
+			console.log("divOffset at end of function:" + divOffset);
 
 		});
 

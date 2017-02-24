@@ -33,6 +33,11 @@ ul.list li:hover {
     box-shadow: #B9E7FF 0px 1px 4px -1px;
 }
 
+
+ul#candidate-list {
+    position: absolute;
+}
+
 div.candidate-color {
         width: 20px;
     height: 20px;
