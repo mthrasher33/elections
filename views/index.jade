@@ -338,10 +338,17 @@ block script
 			if($('select#sRaces').prop('selectedIndex')===0){
 				populateCandidates(true);
 				//paintMap(true)
+
+				//enable precinct view
+				$('input[name=mapView][value=precinctView]').prop('disabled', false);
 			} else{
 
 			//paintMap(true);
-			populateCandidates(false) //we are not initializing, so we do not need to redraw all the wards. just to have re-paint one ward
+			populateCandidates(false) //we are not initializing, so we do not need to redraw all the wards. just to have 
+				//disable precinct view
+				$('input[name=mapView][value=precinctView]').prop('disabled', true);
+
+			//re-paint one ward
 			}
 		});
 
@@ -725,7 +732,7 @@ block script
 
 				if($('select#sRaces').prop('selectedIndex') > 0){
 					removePrecincts();
-					populateRaces(true);
+					populateRaces(true); //this should be the hard repaint that repaints the table
 				} else {
 					//paint all the precincts for the candidate heat map
 					allWards.forEach(function(ward){
