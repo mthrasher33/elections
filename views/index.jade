@@ -386,17 +386,12 @@ block script
 			//I think this is my only choice because of the way the data is being written
 			var selectedCandidate = $('select#sCandidates').val();
 			console.log(selectedCandidate);
-			$('ul#candidate-list')
 			
 
-			//582 for mark andrew
-			//818 for don samuels
-			//1054 for Cam inwton
+	
 
-			//OK, they seem to be 236 apart.
 
-			//this moves correctly from the top position
-			console.log("Div offset before function: " + divOffset)
+	
 
 			//code to move list to candidates
 			var indexOfCandidate = $('ul#candidate-list li').index($('#' + selectedCandidate));
@@ -406,13 +401,18 @@ block script
 				sum += $(this).height() + 22;
 			});
 
-			console.log("height of all previous divs: " + sum);
-			console.log("indexOfcandidate: " + indexOfCandidate);
-
+	
 			var heightOfDiv = $('li#' + selectedCandidate).height()
+			if(indexOfCandidate > 0){
 			$('ul#candidate-list').animate({
 					scrollTop: sum
 				}, 2000);
+			} else { // go to the top 
+					$('ul#candidate-list').animate({
+					scrollTop: $('ul#candidate-list li').position().top
+				}, 2000);			
+
+			}
 
 			/*if(divOffset === 0){
 				$('ul#candidate-list').animate({
