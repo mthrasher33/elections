@@ -121,10 +121,8 @@ block script
 				}
 			} else {//paint all the precincts
 				if(selectedRaceIndex === 0){//if it's the mayor's race, paint all the precincts
-					console.log(allWards);
 					allWards.forEach(function(ward){
 						paintPrecincts(getNewBoundaries, candidateHeatMap, ward)
-						console.log(ward.name);
 					})
 				} else {
 					//just paint the precinct for the one
@@ -136,7 +134,7 @@ block script
 					}
 				});
 					paintPrecincts(true, false, correspondingWard);
-					alert("do something else for the city council races!");
+					//alert("do something else for the city council races!");
 				}
 			}
 		}
@@ -188,7 +186,7 @@ block script
 									});
 								}
 
-								console.log(wardDesign.name + " " + wardDesign.fillOpacity);
+								//console.log(wardDesign.name + " " + wardDesign.fillOpacity);
 
 								google.maps.event.addListener(wardDesign, 'click', function(e){
 									var clickedWard = this;
@@ -292,9 +290,7 @@ block script
 									fillOpacity: heatMap(selectedWard.rc_shade),
 									strokeOpacity: heatMap(selectedWard.strokeOpacityRC)
 								});
-								console.log('changing fillOpacity');
 						}
-					console.log(selectedWard);
 					}
 
 				//allWards[12].setOptions({fillOpacity: allWards[12].rc_shade});
@@ -348,6 +344,9 @@ block script
 		});
 
 		function heatMap(number, isCandidateMap){
+			
+			var checkedValue = $('input[name=mapView]:checked').val()
+			console.log(checkedValue);			
 			if(!isCandidateMap){
 				var newNumber;
 				if(number < .4){
@@ -357,11 +356,20 @@ block script
 				}
 
 
-				} else {
-					if(number > .15){
-						newNumber = number*3;
-					} else {
-						newNumber = number*2;
+				} else {//paint a heat map
+					console.log('heatMap trying to make a candidateMap');
+					if(checkedValue === 'wardView'){
+						console.log('it thinks wardview is checked');
+						//for the ward view
+						if(number > .15){
+							newNumber = number*3;
+						} else {
+							newNumber = number*2;
+						}
+					} else {//the precinct view for the mayor's race
+						console.log('precinct view for mayors race');
+						newNumber = number*18;
+
 					}
 
 				}
@@ -381,7 +389,12 @@ block script
 
 
 		$('select#sCandidates').change(function(){
-			paintMap(true)
+			//only do this if we're on the mayor's race
+			if($('select#sRaces').prop('selectedIndex')===0){
+				paintMap(true)
+			} else {//if we're on the ward races, we have to paint a heat map of a precinct
+				paintPrecincts(true, true, selectedWard);
+			}
 
 
 
@@ -404,14 +417,82 @@ block script
 		});
 
 		function paintPrecincts(getNewBoundaries, candidateHeatMap, wardDesign){
-		if(getNewBoundaries){
+			//whenever we paint a precinct, if we have a candidate selected, we are painting a heat map
+			var candidateHeatMap = ($('select#sCandidates').val() > 0);
+			var selectedRace = $('select#sRaces option:selected').val()
+			var selectedCandidate = $('select#sCandidates option:selected').val();
+		
+			if(getNewBoundaries){
 			removePrecinctsOfSpecificWard(wardDesign);
 			//removePrecinctsOfSpecificWard(selectedWard);
-			var selectedRace = $('select#sRaces option:selected').val()
 		
+			if(!candidateHeatMap){
 				$.getJSON("/getPrecincts/" + wardDesign.id + "/" + selectedRace, function(data){
 					if(data){
 						(data.precincts).forEach(function(precinct){
+							if(precinct[0]){
+
+								//don't turn off the color. just make it invisible
+								//wardDesign.setOptions({fillOpacity: 0});
+
+								wardDesign.setVisible(false);
+
+								precinctDesign = new google.maps.Polygon({
+								    paths: convertDBtoGM(precinct[0]),
+								    strokeColor: 'white',
+								    strokeOpacity: 1,
+								    strokeWeight: 4,
+								    //fillColor: '#FF0000',
+								    //fillOpacity: 0.35,
+								    zIndex: 100,
+								    center: getCenterPolygon(convertDBtoGM(precinct[0])),
+								    name: precinct[0].Precinct_Num,
+								    id: precinct[0].idPrecinct,
+								    type: "precinct",
+								    parentPolygon: wardDesign
+								});
+
+								google.maps.event.addListener(precinctDesign, 'click', function(e){
+									var raceID = $('select#sRaces option:selected').val();
+									var clickedPrecinct = this;
+
+									$.getJSON("/getResults_precinctView/" + this.id +"/" + raceID, function(data){
+										populateRaceTable(data.precinct_results, (clickedPrecinct.parentPolygon).name + ' Precinct ' + clickedPrecinct.name, true);
+									});
+								});
+
+								allPrecincts.push(precinctDesign);
+								
+								if(precinct[0].fptp_shade){
+									precinctDesign.setOptions({
+										fillColor: precinct[0].color,
+										fillOpacity:heatMap(precinct[0].fptp_shade),
+										//strokeOpacity: heatMap(precinct[0].fpfp_shade)
+
+									});
+								} else {
+									precinctDesign.setOptions({
+										fillColor: precinct[0].color,
+										fillOpacity: heatMap(precinct[0].rc_shade),
+										//strokeOpacity: heatMap(precinct[0].rc_shade)
+									})
+
+								}
+								
+								precinctDesign.setMap(map);
+								allPrecincts.push(precinctDesign);
+							}
+
+						});
+
+
+					};
+
+				});
+			} else {//we are painting a heat map and doing a full repaint of everything else
+				$.getJSON("/getPrecincts_candidateHeatMap/" + selectedRace + "/" + selectedCandidate+ "/" + wardDesign.id, function(data){
+					if(data){
+						(data.precinct).forEach(function(precinct){
 							if(precinct[0]){
 
 								//don't turn off the color. just make it invisible
@@ -444,37 +525,46 @@ block script
 									});
 								});
 
-			
-
-								allPrecincts.push(precinctDesign);
 								
 								if(precinct[0].fptp_shade){
 									precinctDesign.setOptions({
 										fillColor: precinct[0].color,
-										fillOpacity:heatMap(precinct[0].fptp_shade),
+										fillOpacity:heatMap(precinct[0].fptp_shade, true),
 										//strokeOpacity: heatMap(precinct[0].fpfp_shade)
 
 									});
 								} else {
 									precinctDesign.setOptions({
 										fillColor: precinct[0].color,
-										fillOpacity: heatMap(precinct[0].rc_shade),
-										//strokeOpacity: heatMap(precinct[0].rc_shade)
+										fillOpacity: heatMap(precinct[0].rc_shade, true),
+										//strokeOpacity: heatMap(precinct[0].rc_shade, true)
 									})
 
 								}
 								
-								//console.log("Parent name: " + (precinctDesign.parentPolygon).name + " Precincnt num: " + precinctDesign.name + " Opacity: " + precinctDesign.fillOpacity);
+								console.log("Parent name: " + (precinctDesign.parentPolygon).name + " Precincnt num: " + precinctDesign.name + " Opacity: " + precinctDesign.fillOpacity);
 								precinctDesign.setMap(map);
 								allPrecincts.push(precinctDesign);
 							}
-
 						});
-
-
 					};
 
 				});
+
+
+
+
+
+
+
+
+
+
+
+			}
+
+
+
 
 			//populate the ward-view of the the full city
 			if (selectedRace.indexOf('Minneapolis') > 0){
@@ -568,13 +658,20 @@ block script
 		$('input[type=radio][name=mapView]').change(function() {
 			var checkedValue = $('input[name=mapView]:checked').val()
 			if (checkedValue === 'wardView'){
-			$('select#sRaces').prop("disabled", false);
+				$('select#sRaces').prop("disabled", false);
 
 				paintMap(true);
 			} else { //painting precincts
 
-			removePrecincts();
-			populateRaces(true);
+				if($('select#sRaces').prop('selectedIndex') > 0){
+					removePrecincts();
+					populateRaces(true);
+				} else {
+					//paint all the precincts for the candidate heat map
+					allWards.forEach(function(ward){
+						paintPrecincts(true, true, ward)
+					})
+				}
 
 			//let's just disable the option to choose the ward races
 			$('select#sRaces').prop("disabled", true);

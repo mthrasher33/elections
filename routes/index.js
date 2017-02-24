@@ -124,6 +124,25 @@ router.get('/getWards_candidateHeatMap/:raceID/:candidateID', function(req,res){
     });
 });
 
+//returns the shape of the precincts that are drawn on the map with a candidate's heat map
+router.get('/getPrecincts_candidateHeatMap/:raceID/:candidateID/:wardID', function(req,res){
+    //var electionDate = req.params.electionYear + "-12-31 23:59:59";
+    var raceID = req.params.raceID;
+    var candidateID = req.params.candidateID;
+    var wardID = req.params.wardID;
+
+    console.log('raceID: ' + raceID + ' candidateID: ' + candidateID + ' wardID: ' + wardID);    
+
+    //console.log(electionDate);
+    datalayer.getPrecinctsHeatMap(raceID, candidateID, wardID, function(err,rows,fields){
+        if(!err) {
+            res.send({precinct: rows});
+        } else {
+            console.log('Error while performing Query: ' + err);
+        }
+    });
+});
+
 
 //returns the center of the ward for the race selected
 router.get('/getWardLocation/:raceID', function(req, res){
