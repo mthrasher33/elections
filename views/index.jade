@@ -338,6 +338,10 @@ block script
 		//when I change the race, I should update the candidates and move the map
 		$('select#sRaces').change(function(){
 			if($('select#sRaces').prop('selectedIndex')===0){
+				//always make precinct view available if you chose the mayor's race
+										$('input[name=mapView][value=precinctView]').prop('disabled', false);
+
+
 				populateCandidates(true);
 				//paintMap(true)
 
