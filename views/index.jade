@@ -61,7 +61,8 @@ block script
 		var selectedPrecinct;
 
 		function populateRaces(newYear){
-						$('input[name=mapView][value=precinctView]').prop('disabled', false);
+			
+			$('input[name=mapView][value=precinctView]').prop('disabled', false);
 
 			var selected = $('select#sYears').val();
 			
@@ -324,6 +325,9 @@ block script
 		}
 
 		$("span#location").click(function(){
+
+												$('input[name=mapView][value=precinctView]').prop('disabled', false);
+
 				var race = "Mayor"
 				$('select#sRaces option:contains('+ race +')').prop('selected', true);
 				var raceID = $('select#sRaces option:selected').val();
