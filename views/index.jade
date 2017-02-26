@@ -61,6 +61,8 @@ block script
 		var selectedPrecinct;
 
 		function populateRaces(newYear){
+						$('input[name=mapView][value=precinctView]').prop('disabled', false);
+
 			var selected = $('select#sYears').val();
 			
 			$.getJSON("/getRaces/" + selected, function(data){
