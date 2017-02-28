@@ -156,6 +156,7 @@ block script
 				removePrecincts();
 				if(!candidateHeatMap){
 					$.getJSON("/getWards/" + selected, function(data){
+
 						(data.wards).forEach(function(ward){
 							if(ward[0] && ward[0].Boundaries){						
 								// Styling & Controls
@@ -176,6 +177,7 @@ block script
 									    strokeOpacityRC: heatMap(ward[0].rc_shade)				    
 								});
 
+
 								if(ward[0].fptp_shade){
 									wardDesign.setOptions({
 										fillColor: ward[0].color,
@@ -190,7 +192,6 @@ block script
 									});
 								}
 
-								//console.log(wardDesign.name + " " + wardDesign.fillOpacity);
 
 								google.maps.event.addListener(wardDesign, 'click', function(e){
 									var clickedWard = this;
@@ -207,6 +208,7 @@ block script
 							}
 						});	
 					});
+
 					//then we paint everything that is in all wards
 					//every time you get all the wards, you sould re-set the candidate table
 					$.getJSON("/getResults_allWards/" + raceID, function(data){
@@ -270,7 +272,6 @@ block script
 
 
 			} else {//we are not doing a full repaint and are just painting individual wards
-				console.log('are we trying to repaint the selected ward?');
 				var raceSelected = $('#sRaces option:selected').text();
 				var correspondingWard;
 				allWards.forEach(function(ward){
@@ -279,7 +280,6 @@ block script
 					}
 				});
 
-				console.log(selectedWard);
 
 				//set the selectedWard color back to the mayor's race color
 				//so this is the code doing the weird stuff with ward 13
@@ -368,7 +368,6 @@ block script
 			var checkedValue = $('input[name=mapView]:checked').val()
 			
 			if(!isCandidateMap){
-				//console.log('heat map goes to is not a candidate map');
 				if(number < .4){
 					newNumber = number-.1;
 				} else {
@@ -408,7 +407,6 @@ block script
 			//I want to highlight the candidate
 			//I think this is my only choice because of the way the data is being written
 			var selectedCandidate = $('select#sCandidates').val();
-			console.log(selectedCandidate);
 			
 
 	
@@ -431,9 +429,11 @@ block script
 					scrollTop: sum
 				}, 2000);
 			} else { // go to the top 
+				if($('ul#candidate-list li').position()){
 					$('ul#candidate-list').animate({
 					scrollTop: $('ul#candidate-list li').position().top
-				}, 2000);			
+					}, 2000);
+				}			
 
 			}
 
@@ -449,9 +449,7 @@ block script
 
 			//just do the index times 236!
 			//index of selected candidate
-			//console.log("Index: " + $('ul#candidate-list li').index($('#' + selectedCandidate)));
 			//variable indexOfCandidate = $('ul#candidate-list li').index($('#' + selectedCandidate))
-			//console.log("Height of element: " + $('#' + selectedCandidate).height());
 
 			//divOffset = $('#' + selectedCandidate).offset().top;
 
@@ -459,11 +457,7 @@ block script
 
 
 
-			//this never changes
-			//console.log($('ul#candidate-list').offset());
 
-			//this changes based on the person selected
-			console.log("divOffset at end of function:" + divOffset);
 
 		}
 
@@ -594,7 +588,6 @@ block script
 
 									$.getJSON("/getResults_precinctView/" + this.id +"/" + raceID, function(data){
 										populateRaceTable(data.precinct_results, (clickedPrecinct.parentPolygon).name + ' Precinct ' + clickedPrecinct.name, true);
-										console.log((clickedPrecinct.parentPolygon).name);
 									});
 								});
 
@@ -615,7 +608,6 @@ block script
 
 								}
 								
-								console.log("Parent name: " + (precinctDesign.parentPolygon).name + " Precincnt num: " + precinctDesign.name + " Opacity: " + precinctDesign.fillOpacity);
 								precinctDesign.setMap(map);
 								allPrecincts.push(precinctDesign);
 							}
@@ -652,6 +644,7 @@ block script
 		}
 
 		function populateRaceTable(candidates, location, precinctLevel){
+		console.log(candidates);
 			$('ul.list').empty();
 			if(location !=='City-Wide'){
 				$('span#location').html(location + '<span id="backToCity">   x</span>');
@@ -665,13 +658,15 @@ block script
 				candidatesLocal = candidates[1];
 			}
 			candidatesLocal.forEach(function(candidate){
+									//candidate is undefiend for 2005
+									console.log(candidate);
 
 					if($('select#sYears option:selected').text().trim() === '2009' || $('select#sYears option:selected').text().trim() === '2013'){
 						//this is the box for people who ran with ranked choice voting
 						$('ul.list').append('<li id=' + candidate.idCandidates_To_Race+ '><div class = "candidate-info" id='+  candidate.idCandidates_To_Race+'><div class="row"><div class="col-xs-2"><div class = "candidate-color" style="background-color: '+candidate.Color+'"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">First place votes: <span class="formatted-votes"> ' + candidate.RC_First_Place_Votes  +'</span><br> Second place votes: <span class="formatted-votes">' + candidate.RC_Second_Place_Votes+ '</span><br> Third place votes: <span class="formatted-votes">' + candidate.RC_Third_Place_Votes + '  </span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
 					} else {
 						//this is the box for people who ran with FPTP voting
-						$('ul.list').append('<li id=' + candidate.idCandidates_To_Race+ '><div class = "candidate-info" id='+  candidate.idCandidates_To_Race+'><div class="row"><div class="col-xs-2"><div class = "candidate-color"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">Votes: <span class="formatted-votes"> ' + candidate.FPTP_Votes_Sum  +'</span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
+						$('ul.list').append('<li id=' + candidate.idCandidates_To_Race+ '><div class = "candidate-info" id='+  candidate.idCandidates_To_Race+'><div class="row"><div class="col-xs-2"><div class = "candidate-color" style="background-color: '+candidate.Color+'"></div></div><div class="col-xs-10"><h3 class="name">'+candidate.First + ' ' + candidate.Last + '</h3></div></div><div class="row"><div class="col-xs-12"><div class="party">' + candidate.Party + '</div></div><div class="col-xs-12"><div class="vote-totals">Votes: <span class="formatted-votes"> ' + candidate.FPTP_Votes  +'</span></div></div></div><div class="row"><div class="col-xs-12"><div class="learn-more">Learn more +</div></div></row></li>');
 					}				
 			});
 
