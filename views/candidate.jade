@@ -2,22 +2,56 @@ extends layout
 
 block content
 	div.candidate-info
-		span #{candidateInfo.Phone} * 
+		span #{candidateInfo.Phone}  
 		span #{candidateInfo.Email}
 	div.candidate-tabs
-		ul.nav.nav-tabs
-			li.active
-				a(data-toggle="tab", href="#races") Races
-			li
-				a(data-toggle="tab", href="#menu1") Contributions
-
-		div.tab-content
-			div#races.tab-pane.fade.in.active
-				h3 Races
-				p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-			div#Contributions.tab-pane.fade
-				h3 MENU 1
-				p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+		if (locals.hasFinancialCommittee.length > 0)
+			ul.nav.nav-tabs
+				li.active
+					a(data-toggle="tab", href="#races") Races		
+				li
+					a(data-toggle="tab", href="#contributions") Contributions
+		else
+			ul.nav.nav-tabs
+				li.active
+					a(data-toggle="tab", href="#races") Races
+		if (locals.hasFinancialCommittee.length> 0)			
+			div.tab-content
+				div#races.tab-pane.fade.in.active		
+					- if (locals.mayorRaceInfo.length > 0)
+						h4 Mayor	
+						each race, i in mayorRaceInfo
+							p #{mayorRaceInfo[i].Date}
+							p #{mayorRaceInfo[i].City} 
+								span #{mayorRaceInfo[i].Seat}
+							
+					- if (locals.wardRaceInfo.length > 0)
+						h4 City Council
+						each race, i in wardRaceInfo
+							p #{wardRaceInfo[i].Date}
+							p #{wardRaceInfo[i].City} 
+								span #{wardRaceInfo[i].Seat} 
+								span #{wardRaceInfo[i].Ward_Name}	
+				div#contributions.tab-pane.fade
+					h3 MENU 1
+					p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+		else
+			div.tab-content
+				div#races.tab-pane.fade.in.active		
+					- if (locals.mayorRaceInfo.length > 0)
+						h4 Mayor	
+						each race, i in mayorRaceInfo
+							p #{mayorRaceInfo[i].Date}
+							p #{mayorRaceInfo[i].City} 
+								span #{mayorRaceInfo[i].Seat}
+							
+					- if (locals.wardRaceInfo.length > 0)
+						h4 City Council
+						each race, i in wardRaceInfo
+							p #{wardRaceInfo[i].Date}
+							p #{wardRaceInfo[i].City} 
+								span #{wardRaceInfo[i].Seat} 
+								span #{wardRaceInfo[i].Ward_Name}	
 
 	a.goBack(href="/") Back to Map
 
