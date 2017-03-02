@@ -16,118 +16,150 @@ block content
 				li.active
 					a(data-toggle="tab", href="#races") Races
 		if (locals.hasFinancialCommittee.length> 0)			
-			div.tab-content
-				div#races.tab-pane.fade.in.active		
-					- if(locals.mayorRaceInfo.length > 0)
-						h4 Mayor	
-						each race, i in mayorRaceInfo
-							row
-							p #{mayorRaceInfo[i].Date}
-							p #{mayorRaceInfo[i].City} 
-								span #{mayorRaceInfo[i].Seat}
-							if(mayorRaceInfo[i].FPTP_Votes_Total)
-								p Total Votes:
-								span #{mayorRaceInfo[i].FPTP_Votes_Total}
-								p Percentage of Popular Vote: 
-								span #{mayorRaceInfo[i].FPTP_Votes_Percentage}
-							else
-								p Total First Place Votes:
-								span #{mayorRaceInfo[i].RC_First_Place_Votes_Total}
-								p Percentage First Place Vote: 
-								span #{mayorRaceInfo[i].RC_First_Place_Votes_Percentage}
-								p Total Second Place Votes:
-								span #{mayorRaceInfo[i].RC_Second_Place_Votes_Total}
-								p Percentage Secpmd Place Vote: 
-								span #{mayorRaceInfo[i].RC_Second_Place_Votes_Percentage}
-								p Total Third Place Votes:
-								span #{mayorRaceInfo[i].RC_Third_Place_Votes_Total}
-								p Percentage Secpmd Place Vote: 
-								span #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
-					- if(locals.wardRaceInfo.length > 0)
-						h4 City Council
-						each race, i in wardRaceInfo
-							p #{wardRaceInfo[i].Date}
-							p #{wardRaceInfo[i].City} 
-								span #{wardRaceInfo[i].Seat} 
-								span #{wardRaceInfo[i].Ward_Name}
-							if(wardRaceInfo[i].FPTP_Votes_Total)
-								p Total Votes:
-								span #{wardRaceInfo[i].FPTP_Votes_Total}
-								p Percentage of Popular Vote: 
-								span #{wardRaceInfo[i].FPTP_Votes_Percentage}
-							else
-								p Total First Place Votes:
-								span #{wardRaceInfo[i].RC_First_Place_Votes_Total}
-								p Percentage First Place Vote: 
-								span #{wardRaceInfo[i].RC_First_Place_Votes_Percentage}
-								p Total Second Place Votes:
-								span #{wardRaceInfo[i].RC_Second_Place_Votes_Total}
-								p Percentage Secpmd Place Vote: 
-								span #{wardRaceInfo[i].RC_Second_Place_Votes_Percentage}
-								p Total Third Place Votes:
-								span #{wardRaceInfo[i].RC_Third_Place_Votes_Total}
-								p Percentage Secpmd Place Vote: 
-								span #{wardRaceInfo[i].RC_Third_Place_Votes_Percentage}		
+			div.row
+				div.tab-content
+					div#races.tab-pane.fade.in.active		
+						- if(locals.mayorRaceInfo.length > 0)
+							each race, i in mayorRaceInfo
+								div.col-xs-4
+									div.race-panel
+										p.title #{mayorRaceInfo[i].City} 
+											span.title #{mayorRaceInfo[i].Seat}
+										p.date #{mayorRaceInfo[i].Date}
+										if(mayorRaceInfo[i].FPTP_Votes_Total)
+											p Total Votes:
+											span #{mayorRaceInfo[i].FPTP_Votes_Total}
+											p Percentage of Popular Vote: 
+											span.number #{mayorRaceInfo[i].FPTP_Votes_Percentage}
+										else
+											span Total First Place Votes: 
+											span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Total}
+											br
+											span Percentage First Place Vote:  
+											span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Percentage}
+											br
+											span Total Second Place Votes: 
+											span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Total}
+											br
+											span Percentage Second Place Vote:  
+											span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Percentage}
+											br
+											span Total Third Place Votes: 
+											span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Total}
+											br
+											span Percentage Third Place Vote: 
+											span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
+						- if(locals.wardRaceInfo.length > 0)
+							each race, i in wardRaceInfo
+								div.col-xs-4
+									div.race-panel
+										p.title #{wardRaceInfo[i].City} 
+											span.title #{wardRaceInfo[i].Seat} 
+											span.title #{wardRaceInfo[i].Ward_Name}
+										p.date #{wardRaceInfo[i].Date}
+
+										if(wardRaceInfo[i].FPTP_Votes_Total)
+											span Total Votes: 
+											span.number #{wardRaceInfo[i].FPTP_Votes_Total}
+											br
+											span Percentage of Popular Vote: 
+											span.number #{wardRaceInfo[i].FPTP_Votes_Percentage}
+										else
+											span Total First Place Votes: 
+											span.number #{wardRaceInfo[i].RC_First_Place_Votes_Total}
+											br
+											span Percentage First Place Vote: 
+											span.number #{wardRaceInfo[i].RC_First_Place_Votes_Percentage}
+											br
+											span Total Second Place Votes: 
+											span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Total}
+											br
+											span Percentage Second Place Vote:  
+											span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Percentage}
+											br
+											span Total Third Place Votes: 
+											span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Total}
+											br
+											span Percentage Third Place Vote:   
+											span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Percentage}		
+
+			div.row
+				a.goBack(href="/") Back to Map
+
 
 				div#contributions.tab-pane.fade
 					h3 MENU 1
 					p#content Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 		else
-			div.tab-content
-				div#races.tab-pane.fade.in.active		
-					- if(locals.mayorRaceInfo.length > 0)
-						h4 Mayor	
-						each race, i in mayorRaceInfo
-							row
-							p #{mayorRaceInfo[i].Date}
-							p #{mayorRaceInfo[i].City} 
-								span #{mayorRaceInfo[i].Seat}
-							if(mayorRaceInfo[i].FPTP_Votes_Total)
-								p Total Votes:
-								span #{mayorRaceInfo[i].FPTP_Votes_Total}
-								p Percentage of Popular Vote: 
-								span #{mayorRaceInfo[i].FPTP_Votes_Percentage}
-							else
-								span Total First Place Votes: 
-								span #{mayorRaceInfo[i].RC_First_Place_Votes_Total}
-								br
-								span Percentage First Place Vote:  
-								span #{mayorRaceInfo[i].RC_First_Place_Votes_Percentage}
-								p Total Second Place Votes:
-								span #{mayorRaceInfo[i].RC_Second_Place_Votes_Total}
-								p Percentage Secpmd Place Vote: 
-								span #{mayorRaceInfo[i].RC_Second_Place_Votes_Percentage}
-								p Total Third Place Votes:
-								span #{mayorRaceInfo[i].RC_Third_Place_Votes_Total}
-								p Percentage Secpmd Place Vote: 
-								span #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
-					- if(locals.wardRaceInfo.length > 0)
-						h4 City Council
-						each race, i in wardRaceInfo
-							p #{wardRaceInfo[i].Date}
-							p #{wardRaceInfo[i].City} 
-								span #{wardRaceInfo[i].Seat} 
-								span #{wardRaceInfo[i].Ward_Name}
-							if(wardRaceInfo[i].FPTP_Votes_Total)
-								p Total Votes:
-								span #{wardRaceInfo[i].FPTP_Votes_Total}
-								p Percentage of Popular Vote: 
-								span #{wardRaceInfo[i].FPTP_Votes_Percentage}
-							else
-								p Total First Place Votes:
-								span #{wardRaceInfo[i].RC_First_Place_Votes_Total}
-								p Percentage First Place Vote: 
-								span #{wardRaceInfo[i].RC_First_Place_Votes_Percentage}
-								p Total Second Place Votes:
-								span #{wardRaceInfo[i].RC_Second_Place_Votes_Total}
-								p Percentage Secpmd Place Vote: 
-								span #{wardRaceInfo[i].RC_Second_Place_Votes_Percentage}
-								p Total Third Place Votes:
-								span #{wardRaceInfo[i].RC_Third_Place_Votes_Total}
-								p Percentage Secpmd Place Vote: 
-								span #{wardRaceInfo[i].RC_Third_Place_Votes_Percentage}		
+			div.row
+				div.tab-content
+					div#races.tab-pane.fade.in.active		
+						- if(locals.mayorRaceInfo.length > 0)
+							each race, i in mayorRaceInfo
+								div.col-xs-4
+									div.race-panel
+										p.title #{mayorRaceInfo[i].City} 
+											span.title #{mayorRaceInfo[i].Seat}
+										p.date #{mayorRaceInfo[i].Date}
+										if(mayorRaceInfo[i].FPTP_Votes_Total)
+											p Total Votes:
+											span #{mayorRaceInfo[i].FPTP_Votes_Total}
+											p Percentage of Popular Vote: 
+											span.number #{mayorRaceInfo[i].FPTP_Votes_Percentage}
+										else
+											span Total First Place Votes: 
+											span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Total}
+											br
+											span Percentage First Place Vote:  
+											span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Percentage}
+											br
+											span Total Second Place Votes: 
+											span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Total}
+											br
+											span Percentage Second Place Vote:  
+											span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Percentage}
+											br
+											span Total Third Place Votes: 
+											span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Total}
+											br
+											span Percentage Third Place Vote: 
+											span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
+						- if(locals.wardRaceInfo.length > 0)
+							each race, i in wardRaceInfo
+								div.col-xs-4
+									div.race-panel
+										p.title #{wardRaceInfo[i].City} 
+											span.title #{wardRaceInfo[i].Seat} 
+											span.title #{wardRaceInfo[i].Ward_Name}
+										p.date #{wardRaceInfo[i].Date}
 
-	a.goBack(href="/") Back to Map
+										if(wardRaceInfo[i].FPTP_Votes_Total)
+											span Total Votes: 
+											span.number #{wardRaceInfo[i].FPTP_Votes_Total}
+											br
+											span Percentage of Popular Vote: 
+											span.number #{wardRaceInfo[i].FPTP_Votes_Percentage}
+										else
+											span Total First Place Votes: 
+											span.number #{wardRaceInfo[i].RC_First_Place_Votes_Total}
+											br
+											span Percentage First Place Vote: 
+											span.number #{wardRaceInfo[i].RC_First_Place_Votes_Percentage}
+											br
+											span Total Second Place Votes: 
+											span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Total}
+											br
+											span Percentage Second Place Vote:  
+											span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Percentage}
+											br
+											span Total Third Place Votes: 
+											span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Total}
+											br
+											span Percentage Third Place Vote:   
+											span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Percentage}		
+
+			div.row
+				a.goBack(href="/") Back to Map
 
 block script
 	script(type='text/javascript').
