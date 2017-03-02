@@ -225,3 +225,8 @@ input.dropdown-toggle::after {
 #backToCity {
     cursor: pointer;
 }
+
+span.glyphicon.glyphicon-zoom-out {
+    margin-left: 15px;
+    top: 2px;
+}

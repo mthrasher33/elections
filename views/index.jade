@@ -319,8 +319,7 @@ block script
 
 		$("span#location").click(function(){
 
-												$('input[name=mapView][value=precinctView]').prop('disabled', false);
-
+				$('input[name=mapView][value=precinctView]').prop('disabled', false);
 				var race = "Mayor"
 				$('select#sRaces option:contains('+ race +')').prop('selected', true);
 				var raceID = $('select#sRaces option:selected').val();
@@ -639,8 +638,9 @@ block script
 		function populateRaceTable(candidates, location, precinctLevel){
 		console.log(candidates);
 			$('ul.list').empty();
+
 			if(location !=='City-Wide'){
-				$('span#location').html(location + '<span id="backToCity">   x</span>');
+				$('span#location').html(location + '<span class="glyphicon glyphicon-zoom-out"></span>');
 			} else {
 				$('span#location').html(location);
 			}
