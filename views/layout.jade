@@ -10,7 +10,11 @@ html
 
   body
     .body-content
-        block content
+        div.container
+            div.row.map-holder
+                div.col-xs-12
+                        h1.map-title #{pageTitle}
+                block content
 
 
 include footer

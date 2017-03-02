@@ -1,0 +1,25 @@
+extends layout
+
+block content
+	div.candidate-info
+		span #{candidateInfo.Phone} * 
+		span #{candidateInfo.Email}
+	div.candidate-tabs
+		ul.nav.nav-tabs
+			li.active
+				a(data-toggle="tab", href="#races") Races
+			li
+				a(data-toggle="tab", href="#menu1") Contributions
+
+		div.tab-content
+			div#races.tab-pane.fade.in.active
+				h3 Races
+				p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+			div#Contributions.tab-pane.fade
+				h3 MENU 1
+				p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+	a.goBack(href="/") Back to Map
+
+block script
+	script(type='text/javascript').

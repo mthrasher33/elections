@@ -12,6 +12,10 @@ var moment = require('moment');
 var MarkerWithLabel = require('markerwithlabel');
 //var bootstrap_select = require('bootstrap-select');
 
+//routers
+var candidate = require('./routes/candidate');
+
+
 var app = express();
 
 // view engine setup
@@ -28,5 +32,6 @@ app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
+app.use('/candidate', candidate);
 
 module.exports = app;

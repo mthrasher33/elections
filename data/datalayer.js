@@ -115,6 +115,16 @@
     }
 
 
+    this.getCandidate_SplashInfo = function(idCandidates_To_Race, callback){
+        pool.getConnection(function(err,connection){
+            connection.query('Call spCandidate_Splash_Page(?);', idCandidates_To_Race, function(err,rows,fields){
+                connection.release();
+                callback(err,rows,fields);
+            })
+        })
+    }
+
+
 
     // this.getPrecincts = function(callback) {
     //     pool.getConnection(function (err, connection) {

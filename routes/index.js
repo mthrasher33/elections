@@ -44,7 +44,7 @@ router.get('/', function (req, res) {
     
     datalayer.getElectionYears(function(err,rows,fields){
         if(!err){
-            res.render('index', {title: 'Test', years: rows});
+            res.render('index', {title: 'Minneapolis Election Results', years: rows, pageTitle: 'Minneapolis Map'});
             console.log(rows);
 
         } else {

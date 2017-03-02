@@ -2,16 +2,9 @@
 extends layout
 
 block content
-	div.container
-		div.row.map-holder
-			div.col-xs-12
-				h1.map-title Minneapolis Map
 			div.col-xs-9
 				div#map
-				div#ward-legend
-
-
-					
+				div#ward-legend		
 			div.col-xs-3
 				div#form
 					div.row
@@ -670,6 +663,13 @@ block script
 					}				
 			});
 
+			//add click event to the divs
+			$('.candidate-info').click(function(event){
+				var idCandidates_To_Race = this.id;
+				window.location.href = '/candidate/' + idCandidates_To_Race;
+			});
+
+
 			if($('select#sCandidates').prop('selectedIndex') > 0){ //after you create a new list, move it if we're on a candidate heat map
 				moveCandidateList();
 			}
@@ -727,6 +727,9 @@ block script
 		}
 
 		/***EVENT BINDING***/
+
+
+
 		$('input[type=radio][name=mapView]').change(function() {
 			var checkedValue = $('input[name=mapView]:checked').val()
 			if (checkedValue === 'wardView'){
