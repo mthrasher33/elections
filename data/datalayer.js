@@ -124,6 +124,33 @@
         })
     }
 
+    this.getCandidateContributions = function(idCandidates_To_Race, callback){
+        pool.getConnection(function(err,connection){
+            connection.query('Call spCandidate_Contributions(?);', idCandidates_To_Race, function(err,rows,fields){
+                connection.release();
+                callback(err,rows,fields);
+            })
+        })
+    }
+
+    this.getCandidateSectorInformation = function(idCommittee, callback){
+        pool.getConnection(function(err,connection){
+            connection.query('Select d.Sector, Sum(d.Money_Received_This_Period) as Total From Donations d Join Reports r on r.idReport = d.idReport Join Committees c on c.idCommittee = r.idCommittee where c.idCommittee = ? Group By d.Sector;', idCommittee, function(err, rows, fields){
+                connection.release();
+                callback(err,rows,fields);
+            })
+        })
+    }
+
+    this.getCandidateTimeline = function(idCommittee, callback){
+        pool.getConnection(function(err,connection){
+            connection.query('Select r.Report_Date, r.Report_Name, Sum(d.Money_Received_This_Period) as Total From Donations d Join Reports r on r.idReport = d.idReport Join Committees c on c.idCommittee = r.idCommittee where c.idCommittee = ? Group By r.idReport Order By r.Report_Date ASC;', idCommittee, function(err, rows, fields){
+                connection.release();
+                callback(err,rows,fields);
+            })
+        })
+    }
+
 
 
     // this.getPrecincts = function(callback) {

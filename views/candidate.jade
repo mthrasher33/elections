@@ -20,147 +20,366 @@ block content
 				div.tab-content
 					div#races.tab-pane.fade.in.active		
 						- if(locals.mayorRaceInfo.length > 0)
-							each race, i in mayorRaceInfo
-								div.col-xs-4
-									div.race-panel
-										p.title #{mayorRaceInfo[i].City} 
-											span.title #{mayorRaceInfo[i].Seat}
-										p.date #{mayorRaceInfo[i].Date}
-										if(mayorRaceInfo[i].FPTP_Votes_Total)
-											p Total Votes:
-											span #{mayorRaceInfo[i].FPTP_Votes_Total}
-											p Percentage of Popular Vote: 
-											span.number #{mayorRaceInfo[i].FPTP_Votes_Percentage}
-										else
-											span Total First Place Votes: 
-											span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Total}
-											br
-											span Percentage First Place Vote:  
-											span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Percentage}
-											br
-											span Total Second Place Votes: 
-											span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Total}
-											br
-											span Percentage Second Place Vote:  
-											span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Percentage}
-											br
-											span Total Third Place Votes: 
-											span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Total}
-											br
-											span Percentage Third Place Vote: 
-											span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
+						each race, i in mayorRaceInfo
+							div.col-xs-4
+								div.race-panel
+									p.title #{mayorRaceInfo[i].City} 
+										span.title #{mayorRaceInfo[i].Seat}
+									p.date #{mayorRaceInfo[i].Date}
+									if(mayorRaceInfo[i].FPTP_Votes_Total)
+										p Total Votes:
+										span #{mayorRaceInfo[i].FPTP_Votes_Total}
+										p Percentage of Popular Vote: 
+										span.number #{mayorRaceInfo[i].FPTP_Votes_Percentage}
+									else
+										span Total First Place Votes: 
+										span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Total}
+										br
+										span Percentage First Place Vote:  
+										span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Percentage}
+										br
+										span Total Second Place Votes: 
+										span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Total}
+										br
+										span Percentage Second Place Vote:  
+										span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Percentage}
+										br
+										span Total Third Place Votes: 
+										span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Total}
+										br
+										span Percentage Third Place Vote: 
+										span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
 						- if(locals.wardRaceInfo.length > 0)
-							each race, i in wardRaceInfo
-								div.col-xs-4
-									div.race-panel
-										p.title #{wardRaceInfo[i].City} 
-											span.title #{wardRaceInfo[i].Seat} 
-											span.title #{wardRaceInfo[i].Ward_Name}
-										p.date #{wardRaceInfo[i].Date}
+						each race, i in wardRaceInfo
+							div.col-xs-4
+								div.race-panel
+									p.title #{wardRaceInfo[i].City} 
+										span.title #{wardRaceInfo[i].Seat} 
+										span.title #{wardRaceInfo[i].Ward_Name}
+									p.date #{wardRaceInfo[i].Date}
 
-										if(wardRaceInfo[i].FPTP_Votes_Total)
-											span Total Votes: 
-											span.number #{wardRaceInfo[i].FPTP_Votes_Total}
-											br
-											span Percentage of Popular Vote: 
-											span.number #{wardRaceInfo[i].FPTP_Votes_Percentage}
-										else
-											span Total First Place Votes: 
-											span.number #{wardRaceInfo[i].RC_First_Place_Votes_Total}
-											br
-											span Percentage First Place Vote: 
-											span.number #{wardRaceInfo[i].RC_First_Place_Votes_Percentage}
-											br
-											span Total Second Place Votes: 
-											span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Total}
-											br
-											span Percentage Second Place Vote:  
-											span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Percentage}
-											br
-											span Total Third Place Votes: 
-											span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Total}
-											br
-											span Percentage Third Place Vote:   
-											span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Percentage}		
+									if(wardRaceInfo[i].FPTP_Votes_Total)
+										span Total Votes: 
+										span.number #{wardRaceInfo[i].FPTP_Votes_Total}
+										br
+										span Percentage of Popular Vote: 
+										span.number #{wardRaceInfo[i].FPTP_Votes_Percentage}
+									else
+										span Total First Place Votes: 
+										span.number #{wardRaceInfo[i].RC_First_Place_Votes_Total}
+										br
+										span Percentage First Place Vote: 
+										span.number #{wardRaceInfo[i].RC_First_Place_Votes_Percentage}
+										br
+										span Total Second Place Votes: 
+										span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Total}
+										br
+										span Percentage Second Place Vote:  
+										span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Percentage}
+										br
+										span Total Third Place Votes: 
+										span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Total}
+										br
+										span Percentage Third Place Vote:   
+										span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Percentage}		
+
+					div#contributions.tab-pane.fade
 
 			div.row
 				a.goBack(href="/") Back to Map
 
-
-				div#contributions.tab-pane.fade
-					h3 MENU 1
-					p#content Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 		else
 			div.row
 				div.tab-content
 					div#races.tab-pane.fade.in.active		
 						- if(locals.mayorRaceInfo.length > 0)
-							each race, i in mayorRaceInfo
-								div.col-xs-4
-									div.race-panel
-										p.title #{mayorRaceInfo[i].City} 
-											span.title #{mayorRaceInfo[i].Seat}
-										p.date #{mayorRaceInfo[i].Date}
-										if(mayorRaceInfo[i].FPTP_Votes_Total)
-											p Total Votes:
-											span #{mayorRaceInfo[i].FPTP_Votes_Total}
-											p Percentage of Popular Vote: 
-											span.number #{mayorRaceInfo[i].FPTP_Votes_Percentage}
-										else
-											span Total First Place Votes: 
-											span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Total}
-											br
-											span Percentage First Place Vote:  
-											span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Percentage}
-											br
-											span Total Second Place Votes: 
-											span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Total}
-											br
-											span Percentage Second Place Vote:  
-											span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Percentage}
-											br
-											span Total Third Place Votes: 
-											span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Total}
-											br
-											span Percentage Third Place Vote: 
-											span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
+						each race, i in mayorRaceInfo
+							div.col-xs-4
+								div.race-panel
+									p.title #{mayorRaceInfo[i].City} 
+										span.title #{mayorRaceInfo[i].Seat}
+									p.date #{mayorRaceInfo[i].Date}
+									if(mayorRaceInfo[i].FPTP_Votes_Total)
+										p Total Votes:
+										span #{mayorRaceInfo[i].FPTP_Votes_Total}
+										p Percentage of Popular Vote: 
+										span.number #{mayorRaceInfo[i].FPTP_Votes_Percentage}
+									else
+										span Total First Place Votes: 
+										span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Total}
+										br
+										span Percentage First Place Vote:  
+										span.number #{mayorRaceInfo[i].RC_First_Place_Votes_Percentage}
+										br
+										span Total Second Place Votes: 
+										span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Total}
+										br
+										span Percentage Second Place Vote:  
+										span.number #{mayorRaceInfo[i].RC_Second_Place_Votes_Percentage}
+										br
+										span Total Third Place Votes: 
+										span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Total}
+										br
+										span Percentage Third Place Vote: 
+										span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
 						- if(locals.wardRaceInfo.length > 0)
-							each race, i in wardRaceInfo
-								div.col-xs-4
-									div.race-panel
-										p.title #{wardRaceInfo[i].City} 
-											span.title #{wardRaceInfo[i].Seat} 
-											span.title #{wardRaceInfo[i].Ward_Name}
-										p.date #{wardRaceInfo[i].Date}
+						each race, i in wardRaceInfo
+							div.col-xs-4
+								div.race-panel
+									p.title #{wardRaceInfo[i].City} 
+										span.title #{wardRaceInfo[i].Seat} 
+										span.title #{wardRaceInfo[i].Ward_Name}
+									p.date #{wardRaceInfo[i].Date}
 
-										if(wardRaceInfo[i].FPTP_Votes_Total)
-											span Total Votes: 
-											span.number #{wardRaceInfo[i].FPTP_Votes_Total}
-											br
-											span Percentage of Popular Vote: 
-											span.number #{wardRaceInfo[i].FPTP_Votes_Percentage}
-										else
-											span Total First Place Votes: 
-											span.number #{wardRaceInfo[i].RC_First_Place_Votes_Total}
-											br
-											span Percentage First Place Vote: 
-											span.number #{wardRaceInfo[i].RC_First_Place_Votes_Percentage}
-											br
-											span Total Second Place Votes: 
-											span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Total}
-											br
-											span Percentage Second Place Vote:  
-											span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Percentage}
-											br
-											span Total Third Place Votes: 
-											span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Total}
-											br
-											span Percentage Third Place Vote:   
-											span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Percentage}		
+									if(wardRaceInfo[i].FPTP_Votes_Total)
+										span Total Votes: 
+										span.number #{wardRaceInfo[i].FPTP_Votes_Total}
+										br
+										span Percentage of Popular Vote: 
+										span.number #{wardRaceInfo[i].FPTP_Votes_Percentage}
+									else
+										span Total First Place Votes: 
+										span.number #{wardRaceInfo[i].RC_First_Place_Votes_Total}
+										br
+										span Percentage First Place Vote: 
+										span.number #{wardRaceInfo[i].RC_First_Place_Votes_Percentage}
+										br
+										span Total Second Place Votes: 
+										span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Total}
+										br
+										span Percentage Second Place Vote:  
+										span.number #{wardRaceInfo[i].RC_Second_Place_Votes_Percentage}
+										br
+										span Total Third Place Votes: 
+										span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Total}
+										br
+										span Percentage Third Place Vote:   
+										span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Percentage}		
+
+					div#contributions.tab-pane.fade
 
 			div.row
 				a.goBack(href="/") Back to Map
-
 block script
 	script(type='text/javascript').
+		var pathName = window.location.pathname;	
+		var globalData;
+
+		$.getJSON("/candidate/getCandidateContributions/" + pathName.split('/')[2], function(data){				
+				if(!data){
+					console.log("no data");
+				} else {
+					globalData = data;
+					//if they have a committee, change the data
+					if($('a[href="#contributions"]').length > 0){
+						(data.contributions).forEach(function(committee){
+							if(committee[0]){
+								createCommitteeRow(committee);
+
+								//add the click events for the filters here
+
+
+								//make the table sortable here
+								//conditional logic prevents re-instantiation
+								if($.fn.dataTable.isDataTable('#donations')){
+								}
+								else{
+									$('table#donations').DataTable({
+									//default sort by most recent at the top
+										"order": [[1, "desc"]],
+										"bLengthChange": false,
+										"searching": false
+									});
+								}
+							}
+						});	
+					}
+
+				}
+		});
+
+		function createCommitteeRow(committee){
+
+			if(!committee[0].Termination_Date){
+				committee[0].Termination_Date = 'Still Active';
+			}
+
+			var row = '<div class="col-xs-12"><div class="committee-panel"><p class="committee-title">' + (committee[0]).Committee_Name;
+			var timeLine = '<div class="row"><div class="col-xs-6"><div class="timelineContainer" id="timelineContainer ' + (committee[0]).idCommittee +'"></div></div></div>'
+			var sectorPieChart = '<div class= "row"><div class="col-xs-6"><div class="sectorPieChartContainer" id="sectorPieChartContainer ' + (committee[0]).idCommittee +'"></div></div>';
+			var sectorBarChart = '<div class="col-xs-6"><div id="sectorBarChartContainer ' + (committee[0]).idCommittee +'"></div></div></div>'
+
+			var row = row + timeLine + sectorPieChart + sectorBarChart;
+			createDonorTable(committee, row);
+		}
+		function createTimeline(committee){
+			$.getJSON("/candidate/getCommitteeTimeline/" + (committee[0]).idCommittee, function(data){
+				if(!data){
+					console.log('error getting data');
+				} else {
+					console.log(data);
+					var dataArray = [];
+					//create the data points for the chart
+					//add the data
+					(data.timeline).forEach(function(timeline){
+						var year = timeline.Report_Date.split("-")[0];
+						var month = timeline.Report_Date.split("-")[1];
+						var day = timeline.Report_Date.split("-")[2].split("T")[0];
+
+
+
+
+						var point = {y: timeline.Total, x: new Date(year, month, day)}
+						//dynamically add the data point
+						dataArray.push(point)
+					});
+					console.log(dataArray);
+				//create the area chart
+					 var areaChart = new CanvasJS.Chart("timelineContainer " + (committee[0]).idCommittee,
+						{
+							title: {
+								text: "Total Committee Funds",
+								fontSize: 25,
+								horizontalAlign: "left"
+							},
+							legend: {
+								maxWidth: 350,
+								itemWidth: 120
+							},
+							data: [
+								{
+									type: "area",
+									showInLegend: true,
+									legendText: "{label}",
+									dataPoints: dataArray /*[
+										{ y: 4181563, indexLabel: "PlayStation 3" },
+										{ y: 2175498, indexLabel: "Wii" },
+										{ y: 3125844, indexLabel: "Xbox 360" },
+										{ y: 1176121, indexLabel: "Nintendo DS"},
+										{ y: 1727161, indexLabel: "PSP" },
+										{ y: 4303364, indexLabel: "Nintendo 3DS"},
+										{ y: 1717786, indexLabel: "PS Vita"}
+									]*/
+								}
+							]
+						});
+						areaChart.render();
+				}
+
+			});
+		}
+
+
+
+		function createSectorCharts(committee){
+			$.getJSON("/candidate/getSectorInformation/" + (committee[0]).idCommittee, function(data){
+				if(!data){
+					console.log('error getting data');
+				} else {
+					var dataArray = [];
+					//create the data points for the chart
+					//add the data
+					(data.sector).forEach(function(sector){
+						var point = {y: sector.Total, label: sector.Sector}
+						//dynamically add the data point
+						dataArray.push(point)
+					});
+
+					//create the base pie chart
+					 var pieChart = new CanvasJS.Chart("sectorPieChartContainer " + (committee[0]).idCommittee,
+						{
+							title: {
+								text: "Percent of Total Donations by Sector",
+								fontSize: 25,
+								horizontalAlign: "left"
+							},
+							legend: {
+								maxWidth: 350,
+								itemWidth: 120
+							},
+							data: [
+								{
+									type: "pie",
+									showInLegend: true,
+									legendText: "{label}",
+									dataPoints: dataArray /*[
+										{ y: 4181563, indexLabel: "PlayStation 3" },
+										{ y: 2175498, indexLabel: "Wii" },
+										{ y: 3125844, indexLabel: "Xbox 360" },
+										{ y: 1176121, indexLabel: "Nintendo DS"},
+										{ y: 1727161, indexLabel: "PSP" },
+										{ y: 4303364, indexLabel: "Nintendo 3DS"},
+										{ y: 1717786, indexLabel: "PS Vita"}
+									]*/
+								}
+							]
+						});
+					 	
+					 	var barChart = new CanvasJS.Chart("sectorBarChartContainer " + (committee[0]).idCommittee,
+						{
+							title: {
+								text: "Total Donations by Sector",
+								fontSize: 25,
+								horizontalAlign: "left"
+
+							},
+							legend: {
+								maxWidth: 350,
+								itemWidth: 120
+							},
+							data: [
+								{
+									type: "bar",
+									showInLegend: true,
+									legendText: "{label}",
+									dataPoints: dataArray /*[
+										{ y: 4181563, indexLabel: "PlayStation 3" },
+										{ y: 2175498, indexLabel: "Wii" },
+										{ y: 3125844, indexLabel: "Xbox 360" },
+										{ y: 1176121, indexLabel: "Nintendo DS"},
+										{ y: 1727161, indexLabel: "PSP" },
+										{ y: 4303364, indexLabel: "Nintendo 3DS"},
+										{ y: 1717786, indexLabel: "PS Vita"}
+									]*/
+								}
+							]
+						});
+
+					pieChart.render();
+					barChart.render();
+				}
+			});
+		}
+
+
+
+		function createDonorTable(committee, row){
+			var addition = '<div class="row"><div class="col-xs-12"><table id="donations" class="table table-striped"><thead><tr><th>Date</th><th>Last</th><th>First</th><th>Employer</th><th>Sector</th><th>Donation</th></tr></thead><tbody>';
+
+			committee.forEach(function(donation){
+
+				var donationRow = '<tr><td>' + donation.Date+ '</td><td>' + donation.First + '</td><td>' + donation.Last + '</td><td>' + donation.Employer + '</td><td>' + donation.Sector +'</td><td>' + donation.Money_Received_This_Period + '</td></tr>';
+				addition = addition + donationRow;
+			});
+
+			addition = addition + '</tbody></table></div>';
+
+
+			row = row + addition;
+
+			closeCommitteeRow(committee, row);
+		}
+
+
+		function closeCommitteeRow(committee, row){
+			var addition = '<div class="col-xs-12"><div class="committee-info"><span>Registration Date: </span><span>' + (committee[0]).Registration_Date+ '</span><span>	Termination Date: </span><span>' + (committee[0]).Termination_Date+ '</span></div></div></div></div></div>'
+			row = row + addition;
+			$('#contributions').append(row);
+
+
+			createSectorCharts(committee);
+			createTimeline(committee)
+
+		}
+
 

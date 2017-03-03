@@ -38,8 +38,30 @@ div.race-panel {
 min-height: 288px;
 }
 
+
+div.committee-panel {
+     border: 1px solid #d9d9d9;
+    padding: 5px;
+    margin-top:20px;
+    margin-bottom: 20px;
+    opacity: .8;
+}
+
+div.committee-panel p.committee-title {
+    font-size: 15px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    border-bottom: 1px solid #d9d9d9;
+    background-color: #dfdfdf;
+    text-align: center;
+}
+
 div.race-panel span {
     line-height: 30px;
+}
+
+div.sectorPieChartContainer, div.timelineContainer{
+    height: 420px;
 }
 
 p.date {
@@ -53,7 +75,7 @@ p.date {
     margin-bottom:20px;
 }
 
-div.race-panel .title {
+ div.race-panel .title {
     font-size: 15px;
     padding-bottom: 10px;
     padding-top: 10px;
