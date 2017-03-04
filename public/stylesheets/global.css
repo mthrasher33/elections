@@ -9,6 +9,11 @@ li {
     list-style: none;
 }
 
+div.candidate-info {
+    margin-left: 15px;
+    margin-bottom: 20px;
+}
+
 span.pull-right {
     position: absolute;
     right: 32px;
@@ -60,8 +65,22 @@ div.race-panel span {
     line-height: 30px;
 }
 
-div.sectorPieChartContainer, div.timelineContainer{
-    height: 420px;
+div.sectorPieChartContainer canvas.canvasjs-chart-canvas {
+    width: 100%;
+}
+
+/*div.tall {
+    height: 600px;
+    width:100%;
+}*/
+
+div.sectorPieChartContainer, div.sectorBarChartContainer{
+    height: 500px;
+
+}
+
+div#donations_wrapper {
+    margin-top: 25px;
 }
 
 p.date {

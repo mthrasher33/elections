@@ -1,9 +1,24 @@
 extends layout
 
 block content
-	div.candidate-info
-		span #{candidateInfo.Phone}  
-		span #{candidateInfo.Email}
+	div.row
+		div.col-xs-12
+			div.candidate-info
+				if (candidateInfo.Phone)
+					span Phone: #{candidateInfo.Phone}
+					br
+				if (candidateInfo.Email)  
+					span Email: #{candidateInfo.Email}
+					br
+				if (candidateInfo.Website)
+					span 
+						a(href="#{candidateInfo.Website}", target="_blank") Website 
+				if (candidateInfo.Facebook)
+					span | 
+						a(href="#{candidateInfo.Facebook}", target="_blank") Facebook 
+				if (candidateInfo.Twitter_Handle)
+					span | 
+						a(href="#{candidateInfo.Twitter_Handle}", target="_blank") Twitter
 	div.candidate-tabs
 		if (locals.hasFinancialCommittee.length > 0)
 			ul.nav.nav-tabs
@@ -188,7 +203,7 @@ block script
 									//default sort by most recent at the top
 										"order": [[1, "desc"]],
 										"bLengthChange": false,
-										"searching": false
+										"searching": true
 									});
 								}
 							}
@@ -206,8 +221,8 @@ block script
 
 			var row = '<div class="col-xs-12"><div class="committee-panel"><p class="committee-title">' + (committee[0]).Committee_Name;
 			var timeLine = '<div class="row"><div class="col-xs-6"><div class="timelineContainer" id="timelineContainer ' + (committee[0]).idCommittee +'"></div></div></div>'
-			var sectorPieChart = '<div class= "row"><div class="col-xs-6"><div class="sectorPieChartContainer" id="sectorPieChartContainer ' + (committee[0]).idCommittee +'"></div></div>';
-			var sectorBarChart = '<div class="col-xs-6"><div id="sectorBarChartContainer ' + (committee[0]).idCommittee +'"></div></div></div>'
+			var sectorPieChart = '<div class= "row"><div class="col-xs-10 col-xs-offset-1"><div class="sectorPieChartContainer" id="sectorPieChartContainer ' + (committee[0]).idCommittee +'"></div></div></div>';
+			var sectorBarChart = '<div class="row"><div class="col-xs-10 col-xs-offset-1"><div class="sectorBarChartContainer" id="sectorBarChartContainer ' + (committee[0]).idCommittee +'"></div></div></div>'
 
 			var row = row + timeLine + sectorPieChart + sectorBarChart;
 			createDonorTable(committee, row);
@@ -235,7 +250,7 @@ block script
 					});
 					console.log(dataArray);
 				//create the area chart
-					 var areaChart = new CanvasJS.Chart("timelineContainer " + (committee[0]).idCommittee,
+				/*	 var areaChart = new CanvasJS.Chart("timelineContainer " + (committee[0]).idCommittee,
 						{
 							title: {
 								text: "Total Committee Funds",
@@ -243,27 +258,20 @@ block script
 								horizontalAlign: "left"
 							},
 							legend: {
-								maxWidth: 350,
-								itemWidth: 120
+								maxWidth: 450,
+								itemWidth: 320
 							},
 							data: [
 								{
 									type: "area",
 									showInLegend: true,
 									legendText: "{label}",
-									dataPoints: dataArray /*[
-										{ y: 4181563, indexLabel: "PlayStation 3" },
-										{ y: 2175498, indexLabel: "Wii" },
-										{ y: 3125844, indexLabel: "Xbox 360" },
-										{ y: 1176121, indexLabel: "Nintendo DS"},
-										{ y: 1727161, indexLabel: "PSP" },
-										{ y: 4303364, indexLabel: "Nintendo 3DS"},
-										{ y: 1717786, indexLabel: "PS Vita"}
-									]*/
+									labelWrap: false,
+									dataPoints: dataArray 
 								}
 							]
-						});
-						areaChart.render();
+						});*/
+						//areaChart.render();
 				}
 
 			});
@@ -277,12 +285,17 @@ block script
 					console.log('error getting data');
 				} else {
 					var dataArray = [];
+					var barDataArray =[];
 					//create the data points for the chart
 					//add the data
 					(data.sector).forEach(function(sector){
+						//var point = {y: sector.Total}
 						var point = {y: sector.Total, label: sector.Sector}
 						//dynamically add the data point
 						dataArray.push(point)
+
+						var barPoint = {x: sector.Total, label: sector.Sector}
+						barDataArray.push(barPoint);
 					});
 
 					//create the base pie chart
@@ -294,14 +307,14 @@ block script
 								horizontalAlign: "left"
 							},
 							legend: {
-								maxWidth: 350,
-								itemWidth: 120
+								//maxWidth: 650,
+								//itemWidth: 400
 							},
 							data: [
 								{
 									type: "pie",
-									showInLegend: true,
-									legendText: "{label}",
+									//showInLegend: true,
+									//legendText: "{label}",
 									dataPoints: dataArray /*[
 										{ y: 4181563, indexLabel: "PlayStation 3" },
 										{ y: 2175498, indexLabel: "Wii" },
@@ -317,36 +330,47 @@ block script
 					 	
 					 	var barChart = new CanvasJS.Chart("sectorBarChartContainer " + (committee[0]).idCommittee,
 						{
-							title: {
+							title:{
 								text: "Total Donations by Sector",
 								fontSize: 25,
-								horizontalAlign: "left"
+								horizontalAlign: "left"				
 
 							},
-							legend: {
-								maxWidth: 350,
-								itemWidth: 120
+							animationEnabled: true,
+							axisX:{
+								interval: 1,
+								gridThickness: 0,
+								labelFontSize: 10,
+								labelFontStyle: "normal",
+								labelFontWeight: "normal",
+								labelFontFamily: "Lucida Sans Unicode"
+
 							},
+							axisY2:{
+								interlacedColor: "rgba(1,77,101,.2)",
+								gridColor: "rgba(1,77,101,.1)",
+								labelFontSize: 10
+
+							},
+
 							data: [
-								{
-									type: "bar",
-									showInLegend: true,
-									legendText: "{label}",
-									dataPoints: dataArray /*[
-										{ y: 4181563, indexLabel: "PlayStation 3" },
-										{ y: 2175498, indexLabel: "Wii" },
-										{ y: 3125844, indexLabel: "Xbox 360" },
-										{ y: 1176121, indexLabel: "Nintendo DS"},
-										{ y: 1727161, indexLabel: "PSP" },
-										{ y: 4303364, indexLabel: "Nintendo 3DS"},
-										{ y: 1717786, indexLabel: "PS Vita"}
-									]*/
-								}
+							{     
+								type: "bar",
+				                name: "companies",
+								axisYType: "secondary",
+								color: "#014D65",				
+								dataPoints: dataArray
+							}
+							
 							]
-						});
+						});						
 
+
+
+					setTimeout(function(){
 					pieChart.render();
 					barChart.render();
+					}, 2000);
 				}
 			});
 		}
@@ -354,7 +378,7 @@ block script
 
 
 		function createDonorTable(committee, row){
-			var addition = '<div class="row"><div class="col-xs-12"><table id="donations" class="table table-striped"><thead><tr><th>Date</th><th>Last</th><th>First</th><th>Employer</th><th>Sector</th><th>Donation</th></tr></thead><tbody>';
+			var addition = '<div class="row"><div class="col-xs-12"><table id="donations" class="table table-striped"><thead><tr><th>Date</th><th>First</th><th>Last</th><th>Employer</th><th>Sector</th><th>Donation</th></tr></thead><tbody>';
 
 			committee.forEach(function(donation){
 
