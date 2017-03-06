@@ -67,5 +67,26 @@ router.get('/getCommitteeTimeline/:idCommittee', function(req,res){
     })
 })
 
+router.get('/getCandidateItemizedContributions/:idCommittee', function(req,res){
+    dataLayer.getCandidateItemizedContributions(req.params.idCommittee, function(err,rows,fields){
+        if(!err){
+            res.send({itemized: rows});
+        } else {
+            console.log('Error while performing Query: ')
+        }
+    })
+})
+
+router.get('/getCandidateLocationContributions/:idCommittee', function(req,res){
+    dataLayer.getCandidateLocationContributions(req.params.idCommittee, function(err,rows,fields){
+        if(!err){
+            res.send({locations: rows});
+        } else {
+            console.log('Error while performing Query: ')
+        }
+    })
+})
+
+
 
 module.exports = router;

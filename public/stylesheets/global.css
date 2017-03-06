@@ -74,8 +74,9 @@ div.sectorPieChartContainer canvas.canvasjs-chart-canvas {
     width:100%;
 }*/
 
-div.sectorPieChartContainer, div.sectorBarChartContainer{
+div.sectorPieChartContainer, div.sectorBarChartContainer, div.timelineContainer, div.itemizedChart, div.locationChart{
     height: 500px;
+    margin-top:20px;
 
 }
 

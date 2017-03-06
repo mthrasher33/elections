@@ -220,63 +220,67 @@ block script
 			}
 
 			var row = '<div class="col-xs-12"><div class="committee-panel"><p class="committee-title">' + (committee[0]).Committee_Name;
-			var timeLine = '<div class="row"><div class="col-xs-6"><div class="timelineContainer" id="timelineContainer ' + (committee[0]).idCommittee +'"></div></div></div>'
+			var timeLine = '<div class="row"><div class="col-xs-10 col-xs-offset-1"><div class="timelineContainer" id="timelineContainer ' + (committee[0]).idCommittee +'"></div></div></div>'
 			var sectorPieChart = '<div class= "row"><div class="col-xs-10 col-xs-offset-1"><div class="sectorPieChartContainer" id="sectorPieChartContainer ' + (committee[0]).idCommittee +'"></div></div></div>';
 			var sectorBarChart = '<div class="row"><div class="col-xs-10 col-xs-offset-1"><div class="sectorBarChartContainer" id="sectorBarChartContainer ' + (committee[0]).idCommittee +'"></div></div></div>'
-
-			var row = row + timeLine + sectorPieChart + sectorBarChart;
+			var itemizedChart = '<div class="row"><div class="col-xs-5"><div class="itemizedChart" id="itemizedChartContainer ' + (committee[0]).idCommittee  + '"></div></div>'
+			var locationChart = '<div class="col-xs-7"><div class="locationChart" id="locationChartContainer ' + (committee[0]).idCommittee  + '"></div></div></div></div>'
+			var row = row + timeLine + sectorPieChart + sectorBarChart + itemizedChart + locationChart;
 			createDonorTable(committee, row);
 		}
+
 		function createTimeline(committee){
 			$.getJSON("/candidate/getCommitteeTimeline/" + (committee[0]).idCommittee, function(data){
 				if(!data){
 					console.log('error getting data');
 				} else {
-					console.log(data);
 					var dataArray = [];
 					//create the data points for the chart
 					//add the data
 					(data.timeline).forEach(function(timeline){
-						var year = timeline.Report_Date.split("-")[0];
-						var month = timeline.Report_Date.split("-")[1];
-						var day = timeline.Report_Date.split("-")[2].split("T")[0];
-
-
-
-
-						var point = {y: timeline.Total, x: new Date(year, month, day)}
+						var year = timeline.Year;
+						var month = timeline.Month_Num;
+						var day = 1;
+						var point = {y: timeline.Amount, x: new Date(year, month, day)}
 						//dynamically add the data point
 						dataArray.push(point)
 					});
-					console.log(dataArray);
+
 				//create the area chart
-				/*	 var areaChart = new CanvasJS.Chart("timelineContainer " + (committee[0]).idCommittee,
+					 var areaChart = new CanvasJS.Chart("timelineContainer " + (committee[0]).idCommittee,
 						{
 							title: {
-								text: "Total Committee Funds",
+								text: "Contribution Analysis",
 								fontSize: 25,
-								horizontalAlign: "left"
+								horizontalAlign: "center"
 							},
-							legend: {
-								maxWidth: 450,
-								itemWidth: 320
+							animationEnabled: true,
+							axisX: {
+								interval: 3
+							},
+							axisY: {
+								title: "Dollars Donated per Month",
+								fontSize: 10
 							},
 							data: [
 								{
 									type: "area",
-									showInLegend: true,
-									legendText: "{label}",
+									//legendText: "{label}",
+									color: "rgba(40,175,101,0.6)",
 									labelWrap: false,
 									dataPoints: dataArray 
 								}
 							]
-						});*/
-						//areaChart.render();
+						});
+						
+						setTimeout(function(){
+							areaChart.render();
+						}, 1500);
+						
 				}
 
 			});
 		}
-
 
 
 		function createSectorCharts(committee){
@@ -315,6 +319,7 @@ block script
 									type: "pie",
 									//showInLegend: true,
 									//legendText: "{label}",
+									indexLabelFontSize: 15,
 									dataPoints: dataArray /*[
 										{ y: 4181563, indexLabel: "PlayStation 3" },
 										{ y: 2175498, indexLabel: "Wii" },
@@ -375,6 +380,94 @@ block script
 			});
 		}
 
+		function createItemizedChart(committee){
+			$.getJSON("/candidate/getCandidateItemizedContributions/" + (committee[0]).idCommittee, function(data){
+				if(!data){
+					console.log('error getting data');
+				} else {
+					
+					//create the base pie chart
+					 var pieChart = new CanvasJS.Chart("itemizedChartContainer " + (committee[0]).idCommittee,
+						{
+							title: {
+								text: "Contribution Types",
+								fontSize: 25,
+								horizontalAlign: "left"
+							},
+							legend: {
+								//maxWidth: 650,
+								//itemWidth: 400
+							},
+							data: [
+								{
+									type: "pie",
+									//showInLegend: true,
+									//legendText: "{label}",
+									indexLabel: "{label}",
+									indexLabelFontSize: 15,									
+									dataPoints: [
+										{y: (data.itemized)[0].Sum_Item, label: 'Itemized'},
+										{y: (data.itemized)[0].Sum_Non, label: 'Non-Itemized'}
+
+									] 
+								}
+							]
+						});
+
+					setTimeout(function(){
+					pieChart.render();
+					}, 2000);						
+					}
+			});		
+		}
+
+		function createLocationChart(committee){
+			$.getJSON("/candidate/getCandidateLocationContributions/" + (committee[0]).idCommittee, function(data){
+				if(!data){
+					console.log('error getting data');
+				} else {
+					var dataArray = [];
+					//create the data points for the chart
+					(data.locations).forEach(function(location){
+						//var point = {y: sector.Total}
+						var point = {y: location.Total, label: location.City}
+						//dynamically add the data point
+						dataArray.push(point)
+					});
+
+					
+					//create the base pie chart
+					 var pieChart = new CanvasJS.Chart("locationChartContainer " + (committee[0]).idCommittee,
+						{
+							title: {
+								text: "Donor Cities",
+								fontSize: 25,
+								horizontalAlign: "left"
+							},
+							legend: {
+								//maxWidth: 650,
+								//itemWidth: 400
+							},
+							data: [
+								{
+									type: "pie",
+									//showInLegend: true,
+									//legendText: "{label}",
+									indexLabel: "{label}",
+									dataPoints: dataArray,
+									indexLabelFontSize: 15
+
+									 
+								}
+							]
+						});
+
+					setTimeout(function(){
+					pieChart.render();
+					}, 2000);						
+					}
+			});		
+		}
 
 
 		function createDonorTable(committee, row){
@@ -403,6 +496,8 @@ block script
 
 			createSectorCharts(committee);
 			createTimeline(committee)
+			createItemizedChart(committee);
+			createLocationChart(committee);
 
 		}
 
