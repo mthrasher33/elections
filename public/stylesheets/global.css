@@ -80,8 +80,43 @@ div.sectorPieChartContainer, div.sectorBarChartContainer, div.timelineContainer,
 
 }
 
-div#donations_wrapper {
-    margin-top: 25px;
+
+div#timeline-panel, div#sectors-pie, div#sectors-bar, div#scale-type, div#scale-location, div#donors-panel {
+    height: 500px;
+}
+
+div.tab-content {
+    margin-left: 15px;
+    margin-right:15px;
+}
+
+div#contributions div.row:first-child {
+    margin-top: 15px;
+}
+
+span.glyphicon.glyphicon-chevron-right, span.glyphicon.glyphicon-chevron-down {
+    top: 2px;
+    right: -10px;
+}
+
+/*h4.panel-title {
+    cursor: pointer;
+}*/
+
+div#contributions div.row div.col-xs-12 div.committee-container div.row:first-child{
+    margin-top: 15px;
+}
+
+
+div.committee-container {
+        padding: 25px;
+    border: 1px solid #d9d9d9;
+    margin-bottom: 10px;
+}
+
+span.marg10 {
+    margin-bottom: 10px;
+    line-height: 40px;
 }
 
 p.date {
@@ -90,7 +125,7 @@ p.date {
     font-style: italic;
     font-color: blue;
     /* background-color: green; */
-    color: brown;
+    color: black;
     text-align:center;
     margin-bottom:20px;
 }
