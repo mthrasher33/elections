@@ -3,7 +3,7 @@ extends layout
 block content
 	div.row
 		div.col-xs-12
-			div.candidate-info
+			div.candidate-contact
 				if (candidateInfo.Phone)
 					span Phone: #{candidateInfo.Phone}
 					br
@@ -611,7 +611,7 @@ block script
 
 			committee.forEach(function(donation){
 
-				var donationRow = '<tr><td>' + donation.Date+ '</td><td>' + donation.First + '</td><td>' + donation.Last + '</td><td>' + donation.Employer + '</td><td>' + donation.Sector +'</td><td>' + donation.Money_Received_This_Period + '</td></tr>';
+				var donationRow = '<tr><td class="donationDate">' + donation.Date+ '</td><td>' + donation.First + '</td><td>' + donation.Last + '</td><td class="donationEmployer">' + donation.Employer + '</td><td>' + donation.Sector +'</td><td>' + donation.Money_Received_This_Period + '</td></tr>';
 				addition = addition + donationRow;
 			});
 

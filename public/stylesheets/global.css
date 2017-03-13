@@ -9,9 +9,17 @@ li {
     list-style: none;
 }
 
-div.candidate-info {
+div.candidate-contact {
     margin-left: 15px;
     margin-bottom: 20px;
+}
+
+td.donationDate {
+    min-width: 80px;
+}
+
+td.donationEmployer {
+    max-width: 150px;
 }
 
 span.pull-right {
