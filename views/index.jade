@@ -32,6 +32,8 @@ block content
 
 					div.form-group
 						label(for='sCandidats') Candidates
+							a.tooltip-candidate(data-toggle="tooltip-candidate" title="Choose a candidate to see their heat map. Darker areas cast a higher percentage of the total votes received by the candidate throughout the entire city.")
+								span.glyphicon.glyphicon-question-sign
 						select.form-control#sCandidates
 
 					div.race-results
@@ -52,6 +54,11 @@ block script
 
 		var selectedWard;
 		var selectedPrecinct;
+
+		$(document).ready(function(){
+			    $('[data-toggle="tooltip-candidate"]').tooltip();   
+
+		});
 
 		function populateRaces(newYear){
 			
@@ -636,7 +643,6 @@ block script
 		}
 
 		function populateRaceTable(candidates, location, precinctLevel){
-		console.log(candidates);
 			$('ul.list').empty();
 
 			if(location !=='City-Wide'){
@@ -652,7 +658,6 @@ block script
 			}
 			candidatesLocal.forEach(function(candidate){
 									//candidate is undefiend for 2005
-									console.log(candidate);
 
 					if($('select#sYears option:selected').text().trim() === '2009' || $('select#sYears option:selected').text().trim() === '2013'){
 						//this is the box for people who ran with ranked choice voting
