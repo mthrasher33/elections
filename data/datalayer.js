@@ -6,7 +6,8 @@
             user: 'admin',
             password: '35THmeridian',
             database: 'election_results',
-            connectionLimit: 100
+            connectionLimit: 100//,
+            //debug:true
         };
 
     var pool = mysql.createPool(creds);
@@ -31,7 +32,7 @@
 
     this.getCandidates = function(idRace, callback){
         pool.getConnection(function(err,connection){
-            connection.query('Select ctr.Color, c.idCandidate, ctr.idCandidates_To_Race, c.First, c.Middle, c.Nickname, c.Last, c.Name_Suffix, ctr.FPTP_Votes_Total, ctr.RC_First_Place_Votes_Total, ctr.RC_Second_Place_Votes_Total, ctr.RC_Third_Place_Votes_Total from Candidates c Join Candidates_To_Race ctr ON ctr.idCandidate = c.idCandidate Where ctr.idRace = ? Order By ctr.FPTP_Votes_Total DESC, ctr.RC_First_Place_Votes_Total DESC, ctr.RC_Second_Place_Votes_Total DESC, ctr.RC_Third_Place_Votes_Total DESC;', idRace, function(err, rows, fields){
+            connection.query('Select ctr.Color, c.idCandidate, ctr.idCandidates_To_Race, c.First, c.Middle, c.Nickname, c.Last, c.Name_Suffix, ctr.FPTP_Votes_Total, ctr.RC_First_Place_Votes_Total, ctr.RC_Second_Place_Votes_Total, ctr.RC_Third_Place_Votes_Total from Candidates c Join Candidates_To_Race ctr ON ctr.idCandidate = c.idCandidate Where ctr.idRace = ? Order By c.Last, ctr.FPTP_Votes_Total DESC, ctr.RC_First_Place_Votes_Total DESC, ctr.RC_Second_Place_Votes_Total DESC, ctr.RC_Third_Place_Votes_Total DESC;', idRace, function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
 
@@ -133,10 +134,13 @@
         })
     }
 
-    this.getCandidateSectorInformation = function(idCommittee, callback){
+    this.getCandidateSectorInformation = function(idCommittee, startMonth, startDay, startYear, endMonth, endDay, endYear, callback){
         pool.getConnection(function(err,connection){
-            connection.query('Select d.Sector, Sum(d.Money_Received_This_Period) as Total From Donations d Join Reports r on r.idReport = d.idReport Join Committees c on c.idCommittee = r.idCommittee where c.idCommittee = ? Group By d.Sector Order By Total DESC;', idCommittee, function(err, rows, fields){
+       
+            connection.query('CALL spCandidate_Sector_Info(?,?,?,?,?,?,?);', [idCommittee, startMonth, startDay, startYear, endMonth, endDay, endYear], function(err, rows, fields){
+             //connection.query('Select * From Committees c where c.idCommittee = ?', idCommittee, startDate, endDate, function(err,rows,fields){
                 connection.release();
+                //console.log(connection.query());
                 callback(err,rows,fields);
             })
         })
@@ -151,19 +155,26 @@
         })
     }
 
-    this.getCandidateItemizedContributions = function(idCommittee, callback){
+    this.getCandidateItemizedContributions = function(idCommittee, startMonth, startDay, startYear, endMonth, endDay, endYear, callback){
         pool.getConnection(function(err,connection){
-            connection.query('Select Round(Sum(Total_Itemized_Contributions),2) As Sum_Item, Round(Sum(Total_Non_Itemized_Contributions),2) As Sum_Non From Reports r Join Committees c On c.idCommittee = r.idCommittee Where c.idCommittee = ?;', idCommittee, function(err, rows, fields){
+            connection.query('Call spCandidate_Itemized_Contributions(?,?,?,?,?,?,?);', [idCommittee, startMonth, startDay, startYear, endMonth, endDay, endYear], function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
+                if(err){
+                    console.log(err);
+                }
             })
         })
     }
 
-    this.getCandidateLocationContributions = function(idCommittee, callback){
+    this.getCandidateLocationContributions = function(idCommittee, startMonth, startDay, startYear, endMonth, endDay, endYear, callback){
         pool.getConnection(function(err,connection){
-            connection.query('Select Sum(d.Money_Received_This_Period) As Total, d.City, d.State From Donations d Join Reports r on r.idReport = d.idReport Join Committees c on c.idCommittee = r.idReport Where c.idCommittee = ? Group By City Order By Total DESC;', idCommittee, function(err, rows, fields){               connection.release();
+            connection.query('Call spCandidate_Location_Contributions(?,?,?,?,?,?,?);', [idCommittee, startMonth, startDay, startYear, endMonth, endDay, endYear], function(err, rows, fields){               connection.release();
                 callback(err,rows,fields);
+
+                if(err){
+                    console.log(err);
+                }
             })
         })
     }

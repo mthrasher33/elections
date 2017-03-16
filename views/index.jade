@@ -65,7 +65,8 @@ block script
 			$('input[name=mapView][value=precinctView]').prop('disabled', false);
 
 			var selected = $('select#sYears').val();
-			
+			var selectedRace = $('select#sRaces').prop('selectedIndex');
+			console.log(selectedRace)
 			$.getJSON("/getRaces/" + selected, function(data){
 
 				//clean out the dropdown menu
@@ -88,6 +89,8 @@ block script
 						$('select#sRaces').append($('<option>').text(value.Name + ' ' + value.Location + ' ').attr('value', value.idRace));
 				});
 
+
+
 				//update the candidate list
 				populateCandidates(newYear); //whenever we update the races (i.e. change the year), we want to fully re-draw the wards
 			});
@@ -103,7 +106,12 @@ block script
 
 				//populate dropdown menu from retrieved data
 				$.each(data.candidates, function(i, value){
-					$('select#sCandidates').append($('<option>').text(value.First + ' ' + value.Last).attr('value', value.idCandidates_To_Race));
+					if(value.First){
+						$('select#sCandidates').append($('<option>').text(value.Last + ', ' + value.First
+						).attr('value', value.idCandidates_To_Race));
+					} else {
+						$('select#sCandidates').append($('<option>').text(value.Last).attr('value', value.idCandidates_To_Race));						
+					}
 				});
 
 				paintMap(newYear);

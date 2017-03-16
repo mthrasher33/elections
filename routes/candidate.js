@@ -47,12 +47,12 @@ router.get('/getCandidateContributions/:idCandidates_To_Race', function(req,res)
     });
 });
 
-router.get('/getSectorInformation/:idCommittee', function(req,res){
-    dataLayer.getCandidateSectorInformation(req.params.idCommittee, function(err,rows,fields){
+router.get('/getSectorInformation/:idCommittee/:startMonth/:startDay/:startYear/:endMonth/:endDay/:endYear', function(req,res){
+    dataLayer.getCandidateSectorInformation(req.params.idCommittee, req.params.startMonth,  req.params.startDay,  req.params.startYear, req.params.endMonth, req.params.endDay, req.params.endYear, function(err,rows,fields){
         if(!err){
             res.send({sector: rows});
         } else {
-            console.log('Error while performing Query: ')
+            console.log('Error while performing Query: ' + err)
         }
     })
 })
@@ -67,8 +67,8 @@ router.get('/getCommitteeTimeline/:idCommittee', function(req,res){
     })
 })
 
-router.get('/getCandidateItemizedContributions/:idCommittee', function(req,res){
-    dataLayer.getCandidateItemizedContributions(req.params.idCommittee, function(err,rows,fields){
+router.get('/getCandidateItemizedContributions/:idCommittee/:startMonth/:startDay/:startYear/:endMonth/:endDay/:endYear', function(req,res){
+    dataLayer.getCandidateItemizedContributions(req.params.idCommittee, req.params.startMonth,  req.params.startDay,  req.params.startYear, req.params.endMonth, req.params.endDay, req.params.endYear, function(err,rows,fields){
         if(!err){
             res.send({itemized: rows});
         } else {
@@ -77,8 +77,8 @@ router.get('/getCandidateItemizedContributions/:idCommittee', function(req,res){
     })
 })
 
-router.get('/getCandidateLocationContributions/:idCommittee', function(req,res){
-    dataLayer.getCandidateLocationContributions(req.params.idCommittee, function(err,rows,fields){
+router.get('/getCandidateLocationContributions/:idCommittee/:startMonth/:startDay/:startYear/:endMonth/:endDay/:endYear', function(req,res){
+    dataLayer.getCandidateLocationContributions(req.params.idCommittee, req.params.startMonth,  req.params.startDay,  req.params.startYear, req.params.endMonth, req.params.endDay, req.params.endYear, function(err,rows,fields){
         if(!err){
             res.send({locations: rows});
         } else {

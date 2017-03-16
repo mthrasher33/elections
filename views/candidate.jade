@@ -135,11 +135,19 @@ block content
 													div#sectors.panel-collapse.collapse
 														div.panel-body
 															div.row
-																div.col-xs-12
+																div.col-xs-2
+																	div#sectorsFilter
+																			label(for='sYearStart') From
+																			select.form-control#sYearStart
+																			label(for='sYearEnd') To
+																			select.form-control#sYearEnd						
+															
+																div.col-xs-10
 																	div#sectors-pie
-															div.row
-																div.col-xs-12
-																	div#sectors-bar
+															//-
+																div.row
+																	div.col-xs-12
+																		div#sectors-bar
 
 									div.row
 										div.col-xs-12
@@ -150,11 +158,18 @@ block content
 															a#scaleLink(href="#scale" data-toggle="collapse") Scale
 																span.glyphicon.glyphicon-chevron-right
 													div#scale.panel-collapse.collapse
-														div.row
-															div.col-xs-5
-																div#scale-type
-															div.col-xs-7
-																div#scale-location
+														div.panel-body
+															div.row
+																div.col-xs-2
+																	div#scaleFilter
+																		label(for='sYearStartScale') From
+																		select.form-control#sYearStartScale
+																		label(for='sYearEndScale') To
+																		select.form-control#sYearEndScale
+																div.col-xs-5
+																	div#scale-type
+																div.col-xs-5
+																	div#scale-location
 									div.row
 										div.col-xs-12
 											div.panel-group
@@ -272,21 +287,25 @@ block script
 
 			$('div#sectors').on("hide.bs.collapse",function(){
 				$('a#sectorsLink').html('Sectors <span class="glyphicon glyphicon-chevron-right"></span>');
+				$('select#sYearStart option').eq(0).prop('selected', true);
+				$('select#sYearEnd option').eq(0).prop('selected', true);
 			});
 
 			$('div#sectors').on("show.bs.collapse",function(){
 				$('a#sectorsLink').html('Sectors <span class="glyphicon glyphicon-chevron-down"></span>');
-				createSectorCharts(committeeG);
+				createSectorCharts(committeeG, '0/0/0000', '01/01/3000'); //default it to the full date range
 			});
 
 			$('div#scale').on("hide.bs.collapse",function(){
 				$('a#scaleLink').html('Scale <span class="glyphicon glyphicon-chevron-right"></span>');
+				$('select#sYearStartScale option').eq(0).prop('selected', true);
+				$('select#sYearEndScale option').eq(0).prop('selected', true);
 			});
 
 			$('div#scale').on("show.bs.collapse",function(){
 				$('a#scaleLink').html('Scale <span class="glyphicon glyphicon-chevron-down"></span>');
-				createItemizedChart(committeeG);
-				createLocationChart(committeeG);
+				createItemizedChart(committeeG, '0/0/0000', '01/01/3000');
+				createLocationChart(committeeG, '0/0/0000', '01/01/3000');
 			});
 
 			$('div#donors').on("hide.bs.collapse",function(){
@@ -320,6 +339,25 @@ block script
 										$('div.committee-container span#closedDate').html('Still Active');
 
 									}
+
+
+									var previousContribution = 0;
+									//populate drop down menus for the sectors and scale tabs
+									(data.contributions[0]).forEach(function(contribution){
+										if(contribution.Date !== previousContribution){
+											$('select#sYearEndScale').append(new Option(contribution.Date, contribution.Date));
+											$('select#sYearEnd').append(new Option(contribution.Date, contribution.Date));
+
+											$('select#sYearStartScale').prepend(new Option(contribution.Date, contribution.Date));
+											$('select#sYearStart').prepend(new Option(contribution.Date, contribution.Date));
+											previousContribution=contribution.Date;
+										}
+									});
+									//Set the default in YearStart to the first index
+									$('select#sYearStart option').eq(0).prop('selected', true);
+									$('select#sYearStartScale option').eq(0).prop('selected', true);
+
+
 									//Termination_Date
 									//add the click events for the filters here
 
@@ -382,7 +420,7 @@ block script
 					 //var areaChart = new CanvasJS.Chart("timelineContainer " + (committee[0]).idCommittee,
 						{
 							title: {
-								text: "Contribution Analysis",
+								text: "Itemized Contribution Analysis",
 								fontSize: 25,
 								horizontalAlign: "center"
 							},
@@ -415,109 +453,126 @@ block script
 		}
 
 
-		function createSectorCharts(committee){
-			$.getJSON("/candidate/getSectorInformation/" + (committee[0]).idCommittee, function(data){
-				if(!data){
-					console.log('error getting data');
-				} else {
-					var dataArray = [];
-					var barDataArray =[];
-					//create the data points for the chart
-					//add the data
-					(data.sector).forEach(function(sector){
-						//var point = {y: sector.Total}
-						var point = {y: sector.Total, label: sector.Sector}
-						//dynamically add the data point
-						dataArray.push(point)
+		function createSectorCharts(committee, dateStart, dateEnd){
+			//if(!dateStart || !dateEnd){
+				var startMonth = dateStart.split('/')[0];
+				var startDay = dateStart.split('/')[1];
+				var startYear = dateStart.split('/')[2];
+				var endMonth = dateEnd.split('/')[0];
+				var endDay = dateEnd.split('/')[1];
+				var endYear = dateEnd.split('/')[2];
 
-						var barPoint = {x: sector.Total, label: sector.Sector}
-						barDataArray.push(barPoint);
-					});
 
-					//create the base pie chart
-					 var pieChart = new CanvasJS.Chart("sectors-pie",
-					 //var pieChart = new CanvasJS.Chart("sectorPieChartContainer " + (committee[0]).idCommittee,
-						{
-							title: {
-								text: "Percent of Total Donations by Sector",
-								fontSize: 25,
-								horizontalAlign: "left"
-							},
-							//animationEnabled: true,
-							legend: {
-								//maxWidth: 650,
-								//itemWidth: 400
-							},
-							data: [
-								{
-									type: "pie",
-									//showInLegend: true,
-									//legendText: "{label}",
-									indexLabelFontSize: 15,
-									dataPoints: dataArray /*[
-										{ y: 4181563, indexLabel: "PlayStation 3" },
-										{ y: 2175498, indexLabel: "Wii" },
-										{ y: 3125844, indexLabel: "Xbox 360" },
-										{ y: 1176121, indexLabel: "Nintendo DS"},
-										{ y: 1727161, indexLabel: "PSP" },
-										{ y: 4303364, indexLabel: "Nintendo 3DS"},
-										{ y: 1717786, indexLabel: "PS Vita"}
-									]*/
-								}
-							]
+
+				$.getJSON("/candidate/getSectorInformation/" + (committee[0]).idCommittee + "/" + startMonth + "/" + startDay + "/" + startYear + "/" + endMonth + "/" + endDay + "/" + endYear, function(data){
+					if(!data){
+						console.log('error getting data');
+					} else {
+						var dataArray = [];
+						var barDataArray =[];
+						//create the data points for the chart
+						//add the data
+						(data.sector[0]).forEach(function(sector){
+							//var point = {y: sector.Total}
+							var point = {y: sector.Total, label: sector.Sector}
+							//dynamically add the data point
+							dataArray.push(point)
+
+							var barPoint = {x: sector.Total, label: sector.Sector}
+							barDataArray.push(barPoint);
 						});
-					 	
-					 	var barChart = new CanvasJS.Chart("sectors-bar",
 
-					 	//var barChart = new CanvasJS.Chart("sectorBarChartContainer " + (committee[0]).idCommittee,
-						{
-							title:{
-								text: "Total Donations by Sector",
-								fontSize: 25,
-								horizontalAlign: "left"				
+						//create the base pie chart
+						 var pieChart = new CanvasJS.Chart("sectors-pie",
+						 //var pieChart = new CanvasJS.Chart("sectorPieChartContainer " + (committee[0]).idCommittee,
+							{
+								title: {
+									text: "Percent of Total Donations by Sector",
+									fontSize: 25,
+									horizontalAlign: "left"
+								},
+								//animationEnabled: true,
+								legend: {
+									//maxWidth: 650,
+									//itemWidth: 400
+								},
+								data: [
+									{
+										type: "pie",
+										//showInLegend: true,
+										//legendText: "{label}",
+										indexLabelFontSize: 15,
+										dataPoints: dataArray /*[
+											{ y: 4181563, indexLabel: "PlayStation 3" },
+											{ y: 2175498, indexLabel: "Wii" },
+											{ y: 3125844, indexLabel: "Xbox 360" },
+											{ y: 1176121, indexLabel: "Nintendo DS"},
+											{ y: 1727161, indexLabel: "PSP" },
+											{ y: 4303364, indexLabel: "Nintendo 3DS"},
+											{ y: 1717786, indexLabel: "PS Vita"}
+										]*/
+									}
+								]
+							});
+						 	
+						 /*	var barChart = new CanvasJS.Chart("sectors-bar", */
+						 	//var barChart = new CanvasJS.Chart("sectorBarChartContainer " + (committee[0]).idCommittee,
+						/*	{
+								title:{
+									text: "Total Donations by Sector",
+									fontSize: 25,
+									horizontalAlign: "left"				
 
-							},
-							//animationEnabled: true,
-							axisX:{
-								interval: 1,
-								gridThickness: 0,
-								labelFontSize: 10,
-								labelFontStyle: "normal",
-								labelFontWeight: "normal",
-								labelFontFamily: "Lucida Sans Unicode"
+								},
+								animationEnabled: true,
+								axisX:{
+									interval: 1,
+									gridThickness: 0,
+									labelFontSize: 10,
+									labelFontStyle: "normal",
+									labelFontWeight: "normal",
+									labelFontFamily: "Lucida Sans Unicode"
 
-							},
-							axisY2:{
-								interlacedColor: "rgba(1,77,101,.2)",
-								gridColor: "rgba(1,77,101,.1)",
-								labelFontSize: 10
+								},
+								axisY2:{
+									interlacedColor: "rgba(1,77,101,.2)",
+									gridColor: "rgba(1,77,101,.1)",
+									labelFontSize: 10
 
-							},
+								},
 
-							data: [
-							{     
-								type: "bar",
-				                name: "companies",
-								axisYType: "secondary",
-								color: "#014D65",				
-								dataPoints: dataArray
-							}
-							
-							]
-						});						
+								data: [
+								{     
+									type: "bar",
+					                name: "companies",
+									axisYType: "secondary",
+									color: "#014D65",				
+									dataPoints: dataArray
+								}
+								
+								]
+							});	*/					
 
 
 
-					//setTimeout(function(){
-					pieChart.render();
-					barChart.render();
-					//}, 2000);
-				}
-			});
+						//setTimeout(function(){
+						pieChart.render();
+						//barChart.render();
+						//}, 2000);
+					}
+				});
+			//}
 		}
 
-		function createItemizedChart(committee){
-			$.getJSON("/candidate/getCandidateItemizedContributions/" + (committee[0]).idCommittee, function(data){
+		function createItemizedChart(committee, dateStart, dateEnd){
+			var startMonth = dateStart.split('/')[0];
+			var startDay = dateStart.split('/')[1];
+			var startYear = dateStart.split('/')[2];
+			var endMonth = dateEnd.split('/')[0];
+			var endDay = dateEnd.split('/')[1];
+			var endYear = dateEnd.split('/')[2];
+			
+			$.getJSON("/candidate/getCandidateItemizedContributions/" + (committee[0]).idCommittee + "/" + startMonth + "/" + startDay + "/" + startYear + "/" + endMonth + "/" + endDay + "/" + endYear , function(data){
 				if(!data){
 					console.log('error getting data');
 				} else {
@@ -527,7 +582,7 @@ block script
 						{
 							title: {
 								text: "Contribution Types",
-								fontSize: 25,
+								fontSize: 23,
 								horizontalAlign: "center"
 							},
 							legend: {
@@ -542,8 +597,8 @@ block script
 									indexLabel: "{label}",
 									indexLabelFontSize: 15,									
 									dataPoints: [
-										{y: (data.itemized)[0].Sum_Item, label: 'Itemized'},
-										{y: (data.itemized)[0].Sum_Non, label: 'Non-Itemized'}
+										{y: (data.itemized)[0][0].Sum_Item, label: 'Itemized'},
+										{y: (data.itemized)[0][0].Sum_Non, label: 'Non-Itemized'}
 
 									] 
 								}
@@ -557,16 +612,29 @@ block script
 			});		
 		}
 
-		function createLocationChart(committee){
-			$.getJSON("/candidate/getCandidateLocationContributions/" + (committee[0]).idCommittee, function(data){
+		function createLocationChart(committee, dateStart, dateEnd){
+				var startMonth = dateStart.split('/')[0];
+				var startDay = dateStart.split('/')[1];
+				var startYear = dateStart.split('/')[2];
+				var endMonth = dateEnd.split('/')[0];
+				var endDay = dateEnd.split('/')[1];
+				var endYear = dateEnd.split('/')[2];
+
+			$.getJSON("/candidate/getCandidateLocationContributions/" + (committee[0]).idCommittee + "/" + startMonth + "/" + startDay + "/" + startYear + "/" + endMonth + "/" + endDay + "/" + endYear, function(data){
 				if(!data){
 					console.log('error getting data');
 				} else {
+					console.log(data);
 					var dataArray = [];
 					//create the data points for the chart
-					(data.locations).forEach(function(location){
+					(data.locations[0]).forEach(function(location){
 						//var point = {y: sector.Total}
+						if(location.State === 'MN'){
 						var point = {y: location.Total, label: location.City}
+						} else {
+							var point = {y: location.Total, label: location.City + ', ' + location.State}
+
+						}
 						//dynamically add the data point
 						dataArray.push(point)
 					});
@@ -576,8 +644,8 @@ block script
 					 var pieChart = new CanvasJS.Chart("scale-location",
 						{
 							title: {
-								text: "Donor Cities",
-								fontSize: 25,
+								text: "Itemized Contributor Cities",
+								fontSize: 23,
 								horizontalAlign: "center"
 							},
 							legend: {
@@ -591,7 +659,7 @@ block script
 									//legendText: "{label}",
 									indexLabel: "{label}",
 									dataPoints: dataArray,
-									indexLabelFontSize: 15
+									indexLabelFontSize: 8
 
 									 
 								}
@@ -651,5 +719,30 @@ block script
 			createLocationChart(committee);
 
 		}
+
+
+		//bind events
+		$('select#sYearEnd').change(function(){
+			var dateStart = $('select#sYearStart option:selected').val();
+			var dateEnd = $('select#sYearEnd option:selected').val();
+			createSectorCharts(committeeG, dateStart, dateEnd);
+		})
+		$('select#sYearStart').change(function(){
+			var dateStart = $('select#sYearStart option:selected').val();
+			var dateEnd = $('select#sYearEnd option:selected').val();
+			createSectorCharts(committeeG, dateStart, dateEnd);
+		})
+		$('select#sYearEndScale').change(function(){
+			var dateStart = $('select#sYearStartScale option:selected').val();
+			var dateEnd = $('select#sYearEndScale option:selected').val();
+			createItemizedChart(committeeG, dateStart, dateEnd);
+			createLocationChart(committeeG, dateStart, dateEnd);
+		})
+		$('select#sYearStartScale').change(function(){
+			var dateStart = $('select#sYearStartScale option:selected').val();
+			var dateEnd = $('select#sYearEndScale option:selected').val();
+			createItemizedChart(committeeG, dateStart, dateEnd);
+			createLocationChart(committeeG, dateStart, dateEnd);
+		})
 
 
