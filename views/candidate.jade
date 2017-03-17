@@ -452,7 +452,7 @@ block script
 			});
 		}
 
-
+		var sectorData;
 		function createSectorCharts(committee, dateStart, dateEnd){
 			//if(!dateStart || !dateEnd){
 				var startMonth = dateStart.split('/')[0];
@@ -465,100 +465,107 @@ block script
 
 
 				$.getJSON("/candidate/getSectorInformation/" + (committee[0]).idCommittee + "/" + startMonth + "/" + startDay + "/" + startYear + "/" + endMonth + "/" + endDay + "/" + endYear, function(data){
+					sectorData = data;
 					if(!data){
 						console.log('error getting data');
 					} else {
-						var dataArray = [];
-						var barDataArray =[];
-						//create the data points for the chart
-						//add the data
-						(data.sector[0]).forEach(function(sector){
-							//var point = {y: sector.Total}
-							var point = {y: sector.Total, label: sector.Sector}
-							//dynamically add the data point
-							dataArray.push(point)
 
-							var barPoint = {x: sector.Total, label: sector.Sector}
-							barDataArray.push(barPoint);
-						});
+						if((data.sector[0]).length < 1){
+							$('div#sectors-pie').html('<p class="no-data">No Data Available for Sector Donations</p>')
+						} else {
+							$('div#sectors-pie').empty();
+							var dataArray = [];
+							var barDataArray =[];
+							//create the data points for the chart
+							//add the data
+							(data.sector[0]).forEach(function(sector){
+								//var point = {y: sector.Total}
+								var point = {y: sector.Total, label: sector.Sector}
+								//dynamically add the data point
+								dataArray.push(point)
 
-						//create the base pie chart
-						 var pieChart = new CanvasJS.Chart("sectors-pie",
-						 //var pieChart = new CanvasJS.Chart("sectorPieChartContainer " + (committee[0]).idCommittee,
-							{
-								title: {
-									text: "Percent of Total Donations by Sector",
-									fontSize: 25,
-									horizontalAlign: "left"
-								},
-								//animationEnabled: true,
-								legend: {
-									//maxWidth: 650,
-									//itemWidth: 400
-								},
-								data: [
-									{
-										type: "pie",
-										//showInLegend: true,
-										//legendText: "{label}",
-										indexLabelFontSize: 15,
-										dataPoints: dataArray /*[
-											{ y: 4181563, indexLabel: "PlayStation 3" },
-											{ y: 2175498, indexLabel: "Wii" },
-											{ y: 3125844, indexLabel: "Xbox 360" },
-											{ y: 1176121, indexLabel: "Nintendo DS"},
-											{ y: 1727161, indexLabel: "PSP" },
-											{ y: 4303364, indexLabel: "Nintendo 3DS"},
-											{ y: 1717786, indexLabel: "PS Vita"}
-										]*/
-									}
-								]
+								var barPoint = {x: sector.Total, label: sector.Sector}
+								barDataArray.push(barPoint);
 							});
-						 	
-						 /*	var barChart = new CanvasJS.Chart("sectors-bar", */
-						 	//var barChart = new CanvasJS.Chart("sectorBarChartContainer " + (committee[0]).idCommittee,
-						/*	{
-								title:{
-									text: "Total Donations by Sector",
-									fontSize: 25,
-									horizontalAlign: "left"				
 
-								},
-								animationEnabled: true,
-								axisX:{
-									interval: 1,
-									gridThickness: 0,
-									labelFontSize: 10,
-									labelFontStyle: "normal",
-									labelFontWeight: "normal",
-									labelFontFamily: "Lucida Sans Unicode"
+							//create the base pie chart
+							 var pieChart = new CanvasJS.Chart("sectors-pie",
+							 //var pieChart = new CanvasJS.Chart("sectorPieChartContainer " + (committee[0]).idCommittee,
+								{
+									title: {
+										text: "Percent of Total Donations by Sector",
+										fontSize: 25,
+										horizontalAlign: "left"
+									},
+									//animationEnabled: true,
+									legend: {
+										//maxWidth: 650,
+										//itemWidth: 400
+									},
+									data: [
+										{
+											type: "pie",
+											//showInLegend: true,
+											//legendText: "{label}",
+											indexLabelFontSize: 15,
+											dataPoints: dataArray /*[
+												{ y: 4181563, indexLabel: "PlayStation 3" },
+												{ y: 2175498, indexLabel: "Wii" },
+												{ y: 3125844, indexLabel: "Xbox 360" },
+												{ y: 1176121, indexLabel: "Nintendo DS"},
+												{ y: 1727161, indexLabel: "PSP" },
+												{ y: 4303364, indexLabel: "Nintendo 3DS"},
+												{ y: 1717786, indexLabel: "PS Vita"}
+											]*/
+										}
+									]
+								});
+							 	
+							 /*	var barChart = new CanvasJS.Chart("sectors-bar", */
+							 	//var barChart = new CanvasJS.Chart("sectorBarChartContainer " + (committee[0]).idCommittee,
+							/*	{
+									title:{
+										text: "Total Donations by Sector",
+										fontSize: 25,
+										horizontalAlign: "left"				
 
-								},
-								axisY2:{
-									interlacedColor: "rgba(1,77,101,.2)",
-									gridColor: "rgba(1,77,101,.1)",
-									labelFontSize: 10
+									},
+									animationEnabled: true,
+									axisX:{
+										interval: 1,
+										gridThickness: 0,
+										labelFontSize: 10,
+										labelFontStyle: "normal",
+										labelFontWeight: "normal",
+										labelFontFamily: "Lucida Sans Unicode"
 
-								},
+									},
+									axisY2:{
+										interlacedColor: "rgba(1,77,101,.2)",
+										gridColor: "rgba(1,77,101,.1)",
+										labelFontSize: 10
 
-								data: [
-								{     
-									type: "bar",
-					                name: "companies",
-									axisYType: "secondary",
-									color: "#014D65",				
-									dataPoints: dataArray
-								}
-								
-								]
-							});	*/					
+									},
+
+									data: [
+									{     
+										type: "bar",
+						                name: "companies",
+										axisYType: "secondary",
+										color: "#014D65",				
+										dataPoints: dataArray
+									}
+									
+									]
+								});	*/					
 
 
 
-						//setTimeout(function(){
-						pieChart.render();
-						//barChart.render();
-						//}, 2000);
+							//setTimeout(function(){
+							pieChart.render();
+							//barChart.render();
+							//}, 2000);
+						}
 					}
 				});
 			//}
@@ -576,38 +583,43 @@ block script
 				if(!data){
 					console.log('error getting data');
 				} else {
-					
-					//create the base pie chart
-					 var pieChart = new CanvasJS.Chart("scale-type",
-						{
-							title: {
-								text: "Contribution Types",
-								fontSize: 23,
-								horizontalAlign: "center"
-							},
-							legend: {
-								//maxWidth: 650,
-								//itemWidth: 400
-							},
-							data: [
-								{
-									type: "pie",
-									//showInLegend: true,
-									//legendText: "{label}",
-									indexLabel: "{label}",
-									indexLabelFontSize: 15,									
-									dataPoints: [
-										{y: (data.itemized)[0][0].Sum_Item, label: 'Itemized'},
-										{y: (data.itemized)[0][0].Sum_Non, label: 'Non-Itemized'}
 
-									] 
-								}
-							]
-						});
+					if((!(data.itemized)[0][0].Sum_Item)){
+						$('div#scale-type').html('<p class="no-data">No Data Available for Contribution Types</p>');
+					} else {
+						$('div#scale-type').empty();
+						//create the base pie chart
+						 var pieChart = new CanvasJS.Chart("scale-type",
+							{
+								title: {
+									text: "Contribution Types",
+									fontSize: 23,
+									horizontalAlign: "center"
+								},
+								legend: {
+									//maxWidth: 650,
+									//itemWidth: 400
+								},
+								data: [
+									{
+										type: "pie",
+										//showInLegend: true,
+										//legendText: "{label}",
+										indexLabel: "{label}",
+										indexLabelFontSize: 15,									
+										dataPoints: [
+											{y: (data.itemized)[0][0].Sum_Item, label: 'Itemized'},
+											{y: (data.itemized)[0][0].Sum_Non, label: 'Non-Itemized'}
 
-					//setTimeout(function(){
-					pieChart.render();
-					//}, 2000);						
+										] 
+									}
+								]
+							});
+
+						//setTimeout(function(){
+						pieChart.render();
+						//}, 2000);						
+						}
 					}
 			});		
 		}
@@ -624,52 +636,58 @@ block script
 				if(!data){
 					console.log('error getting data');
 				} else {
-					console.log(data);
-					var dataArray = [];
-					//create the data points for the chart
-					(data.locations[0]).forEach(function(location){
-						//var point = {y: sector.Total}
-						if(location.State === 'MN'){
-						var point = {y: location.Total, label: location.City}
-						} else {
-							var point = {y: location.Total, label: location.City + ', ' + location.State}
 
-						}
-						//dynamically add the data point
-						dataArray.push(point)
-					});
+					if(data.locations[0].length < 1){
+						$('div#scale-location').html('<p class="no-data">No Data Available for Contribution Locations</p>');
+					} else {
+						$('div#scale-location').empty();
+						console.log(data);
+						var dataArray = [];
+						//create the data points for the chart
+						(data.locations[0]).forEach(function(location){
+							//var point = {y: sector.Total}
+							if(location.State === 'MN'){
+							var point = {y: location.Total, label: location.City}
+							} else {
+								var point = {y: location.Total, label: location.City + ', ' + location.State}
 
-					
-					//create the base pie chart
-					 var pieChart = new CanvasJS.Chart("scale-location",
-						{
-							title: {
-								text: "Itemized Contributor Cities",
-								fontSize: 23,
-								horizontalAlign: "center"
-							},
-							legend: {
-								//maxWidth: 650,
-								//itemWidth: 400
-							},
-							data: [
-								{
-									type: "pie",
-									//showInLegend: true,
-									//legendText: "{label}",
-									indexLabel: "{label}",
-									dataPoints: dataArray,
-									indexLabelFontSize: 8
-
-									 
-								}
-							]
+							}
+							//dynamically add the data point
+							dataArray.push(point)
 						});
 
-					//setTimeout(function(){
-					pieChart.render();
-					//}, 2000);						
+						
+						//create the base pie chart
+						 var pieChart = new CanvasJS.Chart("scale-location",
+							{
+								title: {
+									text: "Itemized Contributor Cities",
+									fontSize: 23,
+									horizontalAlign: "center"
+								},
+								legend: {
+									//maxWidth: 650,
+									//itemWidth: 400
+								},
+								data: [
+									{
+										type: "pie",
+										//showInLegend: true,
+										//legendText: "{label}",
+										indexLabel: "{label}",
+										dataPoints: dataArray,
+										indexLabelFontSize: 8
+
+										 
+									}
+								]
+							});
+
+						//setTimeout(function(){
+						pieChart.render();
+						//}, 2000);						
 					}
+				}
 			});		
 		}
 

@@ -5,6 +5,16 @@ body {
     background-color: #FFFDF9;
 }
 
+p.no-data {
+    text-align: center;
+    /* margin-top: 114px; */
+    height: 50%;
+    margin-top: 25%;
+    border: 1px solid #dadad9;
+    padding-top: 90px;
+    /* background-color: blue; */
+    vertical-align: center;
+}
 li {
     list-style: none;
 }
