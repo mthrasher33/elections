@@ -46,9 +46,10 @@ block content
 										span.title #{mayorRaceInfo[i].Seat}
 									p.date #{mayorRaceInfo[i].Date}
 									if(mayorRaceInfo[i].FPTP_Votes_Total)
-										p Total Votes:
+										span Total Votes:
 										span #{mayorRaceInfo[i].FPTP_Votes_Total}
-										p Percentage of Popular Vote: 
+										br
+										span Percentage of Popular Vote: 
 										span.number #{mayorRaceInfo[i].FPTP_Votes_Percentage}
 									else
 										span Total First Place Votes: 
@@ -202,9 +203,10 @@ block content
 										span.title #{mayorRaceInfo[i].Seat}
 									p.date #{mayorRaceInfo[i].Date}
 									if(mayorRaceInfo[i].FPTP_Votes_Total)
-										p Total Votes:
-										span #{mayorRaceInfo[i].FPTP_Votes_Total}
-										p Percentage of Popular Vote: 
+										span Total Votes:
+										span.number #{mayorRaceInfo[i].FPTP_Votes_Total}
+										br
+										span Percentage of Popular Vote: 
 										span.number #{mayorRaceInfo[i].FPTP_Votes_Percentage}
 									else
 										span Total First Place Votes: 
@@ -286,7 +288,9 @@ block script
 
 			$('div#timeline').on("show.bs.collapse",function(){
 				$('a#timelineLink').html('Timeline <span class="glyphicon glyphicon-chevron-down"></span>');
+				console.log(committeeG);
 				createTimeline(committeeG);
+
 			});
 
 			$('div#sectors').on("hide.bs.collapse",function(){
@@ -403,10 +407,12 @@ block script
 		}
 
 		function createTimeline(committee){
+			console.log(committee[0].idCommittee);
 			$.getJSON("/candidate/getCommitteeTimeline/" + (committee[0]).idCommittee, function(data){
 				if(!data){
 					console.log('error getting data');
 				} else {
+				console.log(data);
 					var dataArray = [];
 					//create the data points for the chart
 					//add the data

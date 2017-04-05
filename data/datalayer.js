@@ -148,7 +148,7 @@
 
     this.getCandidateTimeline = function(idCommittee, callback){
         pool.getConnection(function(err,connection){
-            connection.query('Select MONTH(`Date`) As Month_Num, MONTHNAME(`Date`) As Month_Name, YEAR(`Date`) As Year, Sum(d.Money_Received_This_Period) As Amount From Donations d Join Reports r on r.idReport = d.idReport Join Committees c on c.idCommittee = r.idCommittee Where c.idCommittee = 1 Group by Month_Num, Year Order By Year ASC, Month_Num ASC;', idCommittee, function(err, rows, fields){
+            connection.query('Select MONTH(`Date`) As Month_Num, MONTHNAME(`Date`) As Month_Name, YEAR(`Date`) As Year, Sum(d.Money_Received_This_Period) As Amount From Donations d Join Reports r on r.idReport = d.idReport Join Committees c on c.idCommittee = r.idCommittee Where c.idCommittee = ? Group by Month_Num, Year Order By Year ASC, Month_Num ASC;', idCommittee, function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
             })
