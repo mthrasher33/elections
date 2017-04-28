@@ -2,19 +2,19 @@
 extends layout
 
 block content
-			div.col-xs-9
+			div.col-xs-12.col-md-9
 				div#map
 				div#ward-legend		
-			div.col-xs-3
+			div.col-xs-12.col-md-3
 				div#form
 					div.row
-						div.col-xs-6
+						div.col-xs-6.col-md-5.nopad
 							div.form-group
 								label(for='sYears') Year
 								select.form-control#sYears
 									for year, i in years
 										option.dropdown-item(value="#{years[i].idElection}") #{years[i].Year}
-						div.col-xs-6
+						div.col-xs-6.col-md-7
 							div.toggleViews
 								div.form-group
 									div.radio
@@ -26,15 +26,17 @@ block content
 										label(for='rbPrecinctView').radio-inline
 											input(type='radio' name='mapView' value='precinctView')#rbPrecinctView
 											| Precincts					
-					div.form-group
-						label(for='sYears') Race
-						select.form-control#sRaces
-
-					div.form-group
-						label(for='sCandidats') Candidates
-							a.tooltip-candidate(data-toggle="tooltip-candidate" title="Choose a candidate to see their heat map. Darker areas cast a higher percentage of the total votes received by the candidate throughout the entire city.")
-								span.glyphicon.glyphicon-question-sign
-						select.form-control#sCandidates
+					div.row
+						div.col-xs-6.col-md-12.margintop15
+							div.form-group
+								label(for='sYears') Race
+								select.form-control#sRaces
+						div.col-xs-6.col-md-12.margintop15		
+							div.form-group
+								label(for='sCandidats') Candidates
+									a.tooltip-candidate(data-toggle="tooltip-candidate" title="Choose a candidate to see their heat map. Darker areas cast a higher percentage of the total votes received by the candidate throughout the entire city.")
+										span.glyphicon.glyphicon-question-sign
+								select.form-control#sCandidates
 
 					div.race-results
 						label Results
@@ -47,7 +49,8 @@ block script
 
 		var minneapolis_lat = 44.9723;
 		var minneapolis_lng = -93.270718;
-		var city_zoom = 12;
+		//var city_zoom = 12;
+		var city_zoom;
 
 		var allWards = [];
 		var allPrecincts = [];
@@ -55,8 +58,28 @@ block script
 		var selectedWard;
 		var selectedPrecinct;
 
+		//set the zoom
+
+			    var windowWidth = $(window).width();
+
+			    if(windowWidth < 992) {
+			    	city_zoom = 11;
+			    }  else {
+			    	city_zoom = 12;
+			    }
+		$(window).resize(function(){
+				var windowWidth = $(window).width();
+
+			    if(windowWidth < 992) {
+			    	city_zoom = 11;
+			    }  else {
+			    	city_zoom = 12;
+			    }
+		})
+
 		$(document).ready(function(){
-			    $('[data-toggle="tooltip-candidate"]').tooltip();   
+			    $('[data-toggle="tooltip-candidate"]').tooltip();
+
 
 		});
 

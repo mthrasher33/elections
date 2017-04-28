@@ -222,7 +222,7 @@ div.learn-more {
 }
 
 a.tooltip-candidate {
-    margin-left: 165px;
+    margin-left: 8%;
     text-align:left;
 
 }
@@ -284,10 +284,14 @@ div.toggleViews div.form-group {
 
 
 div#map {
-	height: 765px;
+	height: 400px;
     width: 100%;
 /*    background-color: #d9d9d9;
 */    position:relative;
+}
+
+div#form {
+    margin-top: 30px;
 }
 
     div#ward-legend {
@@ -349,13 +353,14 @@ h1.map-title {
 }
 
 div.map-holder {
-padding: 15px;
+    padding: 15px;
     margin-top: 15px;
     margin-bottom: 50px;
     box-shadow: 1px 2px .5em #B9E7FF;
     background-color:white;
     border: 1px solid #F1F0EB;
     font-family: 'Open Sans', sans-serif;
+    height: 1300px;
 
 }
 
@@ -420,3 +425,69 @@ span.glyphicon.glyphicon-zoom-out {
     margin-left: 15px;
     top: 2px;
 }
+
+div.zeropad {
+    padding: 0;
+}
+
+div.nopad {
+    padding-right: 0;
+}
+
+div.margintop15{
+    margin-top: 15px;
+}
+
+span.glyphicon.glyphicon-question-sign{
+    display:inline;
+}
+
+span.author {
+    font-size: 15px;
+    margin-left:1%;
+    white-space: nowrap;
+
+}
+
+    /* Custom, iPhone Retina */ 
+    @media only screen and (min-width : 320px) {
+        
+    }
+
+    /* Extra Small Devices, Phones */ 
+    @media only screen and (min-width : 480px) {
+
+    }
+
+    /* Small Devices, Tablets */
+    @media only screen and (min-width : 768px) {
+        div.zeropad {
+        padding-left: 15px;
+        padding-right:15px;
+        }
+
+    }
+
+    /* Medium Devices, Desktops */
+    @media only screen and (min-width : 992px) {
+        div.map-holder {
+            height:890px;
+        }
+        div#map {
+            height: 765px;
+        }
+        div#form{
+            margin-top:0px;
+        }
+
+        a.tooltip-candidate {
+            margin-left: 9%;
+        }
+
+
+    }
+
+    /* Large Devices, Wide Screens */
+    @media only screen and (min-width : 1200px) {
+
+    }

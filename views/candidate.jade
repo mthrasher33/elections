@@ -40,7 +40,7 @@ block content
 					div#races.tab-pane.fade.in.active		
 						- if(locals.mayorRaceInfo.length > 0)
 						each race, i in mayorRaceInfo
-							div.col-xs-4
+							div.col-xs-12.col-sm-6.col-md-4.zeropad
 								div.race-panel
 									p.title #{mayorRaceInfo[i].City} 
 										span.title #{mayorRaceInfo[i].Seat}
@@ -71,7 +71,7 @@ block content
 										span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
 						- if(locals.wardRaceInfo.length > 0)
 						each race, i in wardRaceInfo
-							div.col-xs-4
+							div.col-xs-12.col-sm-6.col-md-4.zeropad
 								div.race-panel
 									p.title #{wardRaceInfo[i].City} 
 										span.title #{wardRaceInfo[i].Seat} 
@@ -197,7 +197,7 @@ block content
 					div#races.tab-pane.fade.in.active		
 						- if(locals.mayorRaceInfo.length > 0)
 						each race, i in mayorRaceInfo
-							div.col-xs-4
+							div.col-xs-12.col-sm-6.col-md-4.zeropad
 								div.race-panel
 									p.title #{mayorRaceInfo[i].City} 
 										span.title #{mayorRaceInfo[i].Seat}
@@ -228,7 +228,7 @@ block content
 										span.number #{mayorRaceInfo[i].RC_Third_Place_Votes_Percentage}								
 						- if(locals.wardRaceInfo.length > 0)
 						each race, i in wardRaceInfo
-							div.col-xs-4
+							div.col-xs-12.col-sm-6.col-md-4.zeropad
 								div.race-panel
 									p.title #{wardRaceInfo[i].City} 
 										span.title #{wardRaceInfo[i].Seat} 
