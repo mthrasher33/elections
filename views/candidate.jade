@@ -19,15 +19,17 @@ block content
 				if (candidateInfo.Twitter_Handle)
 					span | 
 						a(href="#{candidateInfo.Twitter_Handle}", target="_blank") Twitter
-				if (candidateInfo.scorecard)
-					br
-					span  
-						a(href="#{candidateInfo.scorecard}", target="_blank") Our Revolution Score Card
+				//-
+					if (candidateInfo.scorecard)
+						br
+						span  
+							a(href="#{candidateInfo.scorecard}", target="_blank") Our Revolution Score Card
 	div.candidate-tabs
 		if (locals.hasFinancialCommittee.length > 0)
 			ul.nav.nav-tabs
 				li.active
 					a(data-toggle="tab", href="#races") Races		
+			//-	
 				li
 					a(data-toggle="tab", href="#contributions") Contributions
 		else
@@ -102,7 +104,7 @@ block content
 										br
 										span Percentage Third Place Vote:   
 										span.number #{wardRaceInfo[i].RC_Third_Place_Votes_Percentage}		
-
+				//-					
 					div#contributions.tab-pane.fade
 						div.row
 							div.col-xs-12
