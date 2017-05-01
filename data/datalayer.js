@@ -1,16 +1,10 @@
 ﻿var DataLayer = function () {
     var mysql = require("mysql");
-    var creds = //require("./_config.js");
-        {
-            host: 'elections.c44css47zkdo.us-west-2.rds.amazonaws.com',
-            user: 'admin',
-            password: '35THmeridian',
-            database: 'election_results',
-            connectionLimit: 100//,
-            //debug:true
-        };
+    var config = require('../config')['production'];
+    var pool = mysql.createPool(config.database);
 
-    var pool = mysql.createPool(creds);
+
+    //var pool = mysql.createPool(creds);
 
     this.getElectionYears = function(callback) {
         pool.getConnection(function(err,connection){

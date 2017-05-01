@@ -1,0 +1,33 @@
+extends layout
+
+block content
+	div.container
+		div.col-xs-12
+			div.row
+				div.col.xs-12.col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2
+					h1.postTitle #{post.title}
+					div.row
+						div.col-xs-12
+							h4.byline Brian Martucci | 
+								span.date #{post.date}
+							div
+								p !{post.content.replace(/\n/g, '<br/>').replace('alignnone', 'img-responsive')}
+							br
+							a(href="/blog") Back
+block script
+	script(type='text/javascript').
+		$(document).ready(function() {
+			$('img.alignnone').addClass('img-responsive')   
+		});
+
+		$('span.date').each(function(){
+				var date = $(this)[0].innerHTML;
+				console.log(date);
+				var newDate = date.substring(0, 15)
+				$(this).html(newDate);
+		});
+
+
+
+
+

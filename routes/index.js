@@ -5,6 +5,8 @@ var GoogleMapsAPI = require('googlemaps');
 var datalayer = require('../data/datalayer.js');
 var moment = require('moment');
 var MarkerWithLabel = require('markerwithlabel');
+var config = require('../config')['production'];
+var wordpress = require( 'wordpress' );
 //var bootstrap_select = require('bootstrap-select');
 
 
@@ -256,5 +258,50 @@ router.post('/contact', function(req,res){
     // });
 
 });
+
+
+router.get('/blog', function(req,res){
+
+    var client = wordpress.createClient({
+        url: "https://mplselectionmap.wordpress.com",
+        username: "matthew.j.thrasher@gmail.com",
+        password: config.wordpressPassword
+    });
+
+    client.getPosts(function(error, posts){
+        if(!error){
+            res.render('blog', { title: 'Blog', pageTitle: 'Mpls Elections Blog', path: req.path, posts: posts});
+            console.log(posts);
+
+        } else {
+            res.render('blog', { title: 'Blog', pageTitle: 'Mpls Elections Blog', path: req.path});
+            console.log(error);
+        }
+
+    });
+
+});
+
+router.get('/blog/:postID', function(req,res){
+
+    var postID = req.params.postID;
+       var client = wordpress.createClient({
+        url: "https://mplselectionmap.wordpress.com",
+        username: "matthew.j.thrasher@gmail.com",
+        password: config.wordpressPassword
+    });
+
+    client.getPost(postID, function(error, post){
+        if(!error){
+            res.render('blogarticle', { title: post.title, pageTitle: 'Mpls Elections Blog', path: req.path, post: post});
+            console.log(post);
+
+        } else {
+            res.render('blogarticle', { title: 'Blog', pageTitle: 'Mpls Elections Blog', path: req.path});
+            console.log(error);
+        }
+
+    }); 
+})
 
 module.exports = router;
