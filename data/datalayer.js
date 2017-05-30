@@ -8,7 +8,7 @@
 
     this.getElectionYears = function(callback) {
         pool.getConnection(function(err,connection){
-            connection.query('Select Extract(YEAR From Date) As Year, idElection from Elections Order by Year Desc;', function(err, rows, fields){
+            connection.query('Select Extract(YEAR From Date) As Year, idElection from Elections Where  inProduction = 1 Order by Year Desc;', function(err, rows, fields){
                 connection.release();
                 callback(err,rows,fields);
             });
