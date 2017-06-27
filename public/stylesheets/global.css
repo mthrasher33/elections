@@ -385,8 +385,8 @@ h1.map-title {
 }
 
 div.map-holder {
-    overflow-x: hidden;
-/*    overflow-y: scroll;
+/*    overflow-x: hidden;
+*//*    overflow-y: scroll;
 */    padding: 15px;
     margin-top: 15px;
     margin-bottom: 50px;
